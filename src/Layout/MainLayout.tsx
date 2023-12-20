@@ -15,7 +15,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 			<StatusBar />
 			<View useSafeArea style={styles.container}>
 				<Header />
-				{children}
+				<View style={styles.contentContainer}>{children}</View>
 			</View>
 		</>
 	);
@@ -23,6 +23,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 
 const styles = StyleSheet.create({
 	container: { flex: 1, marginTop: 32, position: "relative" },
+	contentContainer: {
+		flex: 1,
+		padding: 16,
+	},
 });
 
 export default MainLayout;
