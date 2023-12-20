@@ -2,7 +2,7 @@
 import { useMemo, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { BleManager, Device } from "react-native-ble-plx";
-import localStorage, { LAST_DEVICE } from "./localStorage";
+import localStorage, { STORAGE_KEY } from "../storage/localStorage";
 import * as ExpoDevice from "expo-device";
 import { useEffect } from "react";
 
@@ -17,9 +17,12 @@ interface BluetoothLowEnergyApi {
 function useBLE(): BluetoothLowEnergyApi {
 	const bleManager = useMemo(() => new BleManager(), []);
 
+	// Danh sách thiết bị đang quét
 	const [allDevices, setAllDevices] = useState<Device[]>([]);
+	// Thiết bị hiện đang kết nối
 	const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
 
+	// Yêu cầu quyền sử dụng bluetooth
 	const requestAndroid31Permissions = async () => {
 		const bluetoothScanPermission = await PermissionsAndroid.request(
 			PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
@@ -80,9 +83,11 @@ function useBLE(): BluetoothLowEnergyApi {
 		return true;
 	};
 
+	// Kiểm tra xem thiết bị đã từng quét hay chưa tránh trùng
 	const isDuplicateDevice = (devices: Device[], nextDevice: Device) =>
 		devices.findIndex((device) => nextDevice.id === device.id) > -1;
 
+	// Quét các thiết bị ngoại vi
 	const scanForPeripherals = async () => {
 		bleManager.startDeviceScan(null, null, (error, device) => {
 			if (error) {
@@ -101,6 +106,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		});
 	};
 
+	// Kết nối đến thiết bị
 	const connectToDevice = async (device: Device) => {
 		try {
 			const deviceConnection = await bleManager.connectToDevice(device.id);
@@ -110,7 +116,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 			// Save device to local storage
 			localStorage.save({
-				key: LAST_DEVICE,
+				key: STORAGE_KEY,
 				data: device.id,
 			});
 		} catch (e) {
@@ -121,20 +127,18 @@ function useBLE(): BluetoothLowEnergyApi {
 	// Get last connected device
 	useEffect(() => {
 		async function tryGetLastDevice() {
-      try {
-        const localData = await localStorage.load({ key: LAST_DEVICE });
+			try {
+				const localData = await localStorage.load({ key: STORAGE_KEY });
 
-        if (localData) {
-          const id = localData;
-          console.log("LOCALID: " + id);
-          const deviceConnection = await bleManager.connectToDevice(id);
-          setConnectedDevice(deviceConnection);
-          await deviceConnection.discoverAllServicesAndCharacteristics();
-        }
-      } catch (e) {
-        console.log(e);
-      }
-
+				if (localData) {
+					const id = localData;
+					const deviceConnection = await bleManager.connectToDevice(id);
+					setConnectedDevice(deviceConnection);
+					await deviceConnection.discoverAllServicesAndCharacteristics();
+				}
+			} catch (e) {
+				console.log("Lỗi khi đọc dữ liệu cũ trước đó: " + e);
+			}
 		}
 
 		tryGetLastDevice();
