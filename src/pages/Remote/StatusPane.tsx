@@ -82,4 +82,4 @@ const StatusPane = ({
 		</View>
 	);
 };
-export default StatusPane;
+export default React.memo(StatusPane);
