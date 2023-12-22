@@ -1,12 +1,13 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import { View, ViewProps } from "react-native-ui-lib";
+import { COLORS } from "../../utils/color";
 
 const LinearGradientView = (props: ViewProps) => {
 	return (
 		<View {...props}>
 			<LinearGradient
-				colors={["#1D8DFD", "#56A9F4"]}
+				colors={[COLORS.PRIMARY, COLORS.LIGHT_PRIMARY]}
 				locations={[0.0244, 0.9869]}
 				start={{ x: 0.03, y: 0 }}
 				end={{ x: 0.97, y: 0 }}

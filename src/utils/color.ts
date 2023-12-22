@@ -5,8 +5,13 @@ export const ICON_COLORS = {
 
 export const COLORS = {
 	TEXT_BLACK: "#333333",
+	LIGHT_GRAY: "#BDBDBD",
 	WHITE: "#ffffff",
 	PRIMARY: "#1D8DFD",
+	LIGHT_PRIMARY: "#56A9F4",
 	SECONDARY: "#848484",
 	GRAY: "#616161",
+	RED: "#F44336",
+	GREEN: "#4CAF50",
+	YELLOW: "#FFEB3B",
 };

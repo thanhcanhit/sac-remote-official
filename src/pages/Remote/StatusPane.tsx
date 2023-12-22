@@ -1,43 +1,12 @@
 import React, { useState } from "react";
-import { Button, Text, TouchableOpacity, View } from "react-native-ui-lib";
-import { COLORS, ICON_COLORS } from "../../utils/color";
-import { StyleSheet } from "react-native";
-import { BOX_SHADOW } from "../../utils/styles";
+import { ScrollBar, View } from "react-native-ui-lib";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import StatusProgress from "./StatusProgress";
+import ServiceButton from "./ServiceButton";
+import { ServiceName } from ".";
 
-const ServiceButton = ({
-	name,
-	icon,
-	isActive,
-	onPress,
-}: {
-	name: string;
-	icon: React.ReactElement;
-	isActive: boolean;
-	onPress?: () => void;
-}) => {
-	return (
-		<TouchableOpacity
-			padding-16
-			br40
-			center
-			backgroundColor={isActive ? COLORS.PRIMARY : COLORS.WHITE}
-			style={[styles.serviceButton, BOX_SHADOW.NORMAL]}
-			onPress={onPress}
-		>
-			<icon.type
-				{...icon.props}
-				color={isActive ? COLORS.WHITE : COLORS.TEXT_BLACK}
-			/>
-			<Text color={isActive ? COLORS.WHITE : COLORS.TEXT_BLACK}>{name}</Text>
-		</TouchableOpacity>
-	);
-};
-
-type activeState = "temperature" | "humidity";
 const serviceList: {
-	id: activeState;
+	id: ServiceName;
 	label: string;
 	icon: React.ReactElement;
 }[] = [
@@ -51,33 +20,66 @@ const serviceList: {
 		label: "Độ ẩm",
 		icon: <MaterialCommunityIcon name="water-outline" size={30} />,
 	},
+	{
+		id: "battery",
+		label: "Lượng pin",
+		icon: <MaterialCommunityIcon name="battery-outline" size={30} />,
+	},
 ];
 
-const StatusPane = () => {
-	const [currentActive, setCurrentActive] =
-		useState<activeState>("temperature");
+type StatusPaneProps = {
+	currentActive: ServiceName;
+	changeCurrentActive: (serviceId: ServiceName) => void;
+	temperature: number;
+	humidity: number;
+	battery: number;
+};
+
+const StatusPane = ({
+	currentActive,
+	changeCurrentActive,
+	temperature,
+	humidity,
+	battery,
+}: StatusPaneProps) => {
+	const activeStatus = (() => {
+		switch (currentActive) {
+			case "temperature":
+				return <StatusProgress state={temperature} />;
+			case "humidity":
+				return <StatusProgress state={humidity} />;
+			case "battery":
+				return <StatusProgress state={battery} />;
+		}
+	})();
 
 	return (
 		<View>
-			<View row>
-				{serviceList.map((service) => (
-					<ServiceButton
-						key={service.id}
-						name={service.label}
-						isActive={service.id === currentActive}
-						icon={service.icon}
-						onPress={() => {
-							setCurrentActive(service.id);
-						}}
-					/>
-				))}
-			</View>
+			<ScrollBar gradientMargins={8}>
+				<View
+					row
+					padding-8
+					marginB-24
+					gap-8
+					style={{ marginLeft: -6, zIndex: 9 }}
+				>
+					{serviceList.map((service) => (
+						<ServiceButton
+							key={service.id}
+							id={service.id}
+							name={service.label}
+							isActive={service.id === currentActive}
+							icon={service.icon}
+							value={service.id == "battery" ? battery : 0}
+							onPress={() => {
+								changeCurrentActive(service.id);
+							}}
+						/>
+					))}
+				</View>
+			</ScrollBar>
+			<View>{activeStatus}</View>
 		</View>
 	);
 };
-
-const styles = StyleSheet.create({
-	serviceButton: {},
-});
-
 export default StatusPane;

@@ -1,17 +1,19 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, SetStateAction } from "react";
 import {
 	withSpring,
 	useAnimatedStyle,
 	useSharedValue,
 } from "react-native-reanimated";
 import { AnimatedImage, View, TouchableOpacity } from "react-native-ui-lib";
+import { COLORS } from "../../utils/color";
+import { BOX_SHADOW } from "../../utils/styles";
 
 type FanSwitchProps = {
 	state: boolean;
-	onPress: () => void;
-}
+	onPress: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-const FanSwitch = ({state, onPress: onChange}:FanSwitchProps) => {
+const FanSwitch = ({ state, onPress: onChange }: FanSwitchProps) => {
 	const angle = useSharedValue(0);
 
 	const animatedStyles = useAnimatedStyle(() => {
@@ -23,13 +25,12 @@ const FanSwitch = ({state, onPress: onChange}:FanSwitchProps) => {
 	// Turn on/off animation
 	useEffect(() => {
 		let interval: any;
-		let interval2: any;
 		if (state) {
 			// Fan
 			interval = setInterval(() => {
 				if (angle.value % 360 === 0) angle.value = 0;
 				angle.value = withSpring(angle.value + 60);
-			}, 1000 / 30);
+			}, 1000 / 20);
 		}
 		return () => {
 			clearInterval(interval);
@@ -37,14 +38,19 @@ const FanSwitch = ({state, onPress: onChange}:FanSwitchProps) => {
 	}, [state]);
 
 	return (
-		<TouchableOpacity onPress={onChange}>
+		<TouchableOpacity
+			onPress={() => onChange(!state)}
+			br100
+			backgroundColor={COLORS.WHITE}
+			style={BOX_SHADOW.SMALL}
+		>
 			<View padding-4 row>
 				<AnimatedImage
 					source={require("../../assets/imgs/fan.png")}
 					style={[
 						{
-							width: 50,
-							height: 50,
+							width: 40,
+							height: 40,
 						},
 						animatedStyles,
 					]}
@@ -56,4 +62,4 @@ const FanSwitch = ({state, onPress: onChange}:FanSwitchProps) => {
 	);
 };
 
-export default FanSwitch;
+export default React.memo(FanSwitch);

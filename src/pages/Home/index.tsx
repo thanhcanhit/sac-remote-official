@@ -1,17 +1,12 @@
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
-import {
-	Button,
-	GridList,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native-ui-lib";
+import { Text, TouchableOpacity, View } from "react-native-ui-lib";
 import { RootDrawerParamList } from "../../../App";
 import LinearGradientView from "../../components/LinearGradientView";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS, ICON_COLORS } from "./../../utils/color";
+import { BOX_SHADOW } from "../../utils/styles";
 
 const RemoteIcon = (
 	<MaterialCommunityIcon name="remote" size={40} color={COLORS.WHITE} />
@@ -34,14 +29,13 @@ const Home = () => {
 					SAC chúc bạn một ngày mới tốt lành ❤️
 				</Text>
 			</View>
-			<TouchableOpacity onPress={moveToRemotePage}>
-				<LinearGradientView
-					marginB-24
-					br40
-					height={150}
-					row
-					style={{ overflow: "hidden" }}
-				>
+			<TouchableOpacity
+				marginB-24
+				br40
+				style={[{ height: 150, overflow: "hidden" }, BOX_SHADOW.NORMAL]}
+				onPress={moveToRemotePage}
+			>
+				<LinearGradientView height={150} row>
 					<View flex-1 center>
 						{RemoteIcon}
 					</View>
