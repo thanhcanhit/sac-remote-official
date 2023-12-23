@@ -1,14 +1,11 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { Text, View } from "react-native-ui-lib";
 import { COLORS } from "../../utils/color";
-import { BOX_SHADOW } from "../../utils/styles";
 import { LinearGradient } from "expo-linear-gradient";
 
 type StatusProgressProps = {
 	state: number;
-	// min?: string;
-	// max?: string;
 };
 
 const StatusProgress = ({ state }: StatusProgressProps) => {
@@ -39,7 +36,6 @@ const StatusProgress = ({ state }: StatusProgressProps) => {
 							width: 160,
 							height: 160,
 							borderRadius: 999,
-							position: "relative",
 						}}
 					>
 						<Text text20 color={COLORS.WHITE} style={{ fontWeight: "bold" }}>
@@ -48,30 +44,6 @@ const StatusProgress = ({ state }: StatusProgressProps) => {
 					</LinearGradient>
 				)}
 			</AnimatedCircularProgress>
-			{/* <View
-				style={{
-					position: "absolute",
-					left: 0,
-					bottom: 0,
-					zIndex: 999,
-				}}
-			>
-				<Text text50 color={COLORS.PRIMARY}>
-					0°C
-				</Text>
-			</View>
-			<View
-				style={{
-					position: "absolute",
-					right: 0,
-					bottom: 0,
-					zIndex: 999,
-				}}
-			>
-				<Text text50 color={COLORS.PRIMARY}>
-					100°C
-				</Text>
-			</View> */}
 		</View>
 	);
 };

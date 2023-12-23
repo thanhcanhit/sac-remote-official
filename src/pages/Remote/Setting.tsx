@@ -157,6 +157,7 @@ const Setting = () => {
 						<View paddingH-16>
 							<Slider
 								useRange
+								useGap={false}
 								minimumValue={0}
 								maximumValue={100}
 								initialMinimumValue={slider.min}

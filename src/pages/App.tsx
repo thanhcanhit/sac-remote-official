@@ -15,7 +15,7 @@ import DeviceModal from "../../DeviceModal";
 
 export default function App() {
 	// Trạng thái bluetooth và gửi yêu cầu tới người dùng
-	const { state, requestToEnable } = useBluetoothState();
+	const { requestToEnable } = useBluetoothState();
 	// Yêu cầu cấp quyền và đọc các thông tin thiết bị
 	const {
 		requestPermissions,
@@ -96,9 +96,9 @@ export default function App() {
 			}
 		}
 
-		if (state !== "PoweredOn") {
-			requestTurnOnBluetooth();
-		}
+		// if (state !== "PoweredOn") {
+		// 	requestTurnOnBluetooth();
+		// }
 	}, []);
 
 	useEffect(() => {

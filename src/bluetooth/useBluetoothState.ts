@@ -4,23 +4,16 @@ import BluetoothStateManager, {
 } from "react-native-bluetooth-state-manager";
 
 type useBluetoothStateAPI = {
-	state: BluetoothState;
+	getBluetoothState: () => Promise<BluetoothState>;
 	requestToEnable: () => Promise<Boolean>;
 	turnOffBluetooth: () => void;
 	turnOnBluetooth: () => void;
 };
 
 const useBluetoothState = (): useBluetoothStateAPI => {
-	const [state, setState] = useState<BluetoothState>("Unknown");
-
-	useEffect(() => {
-		async function getDeviceBluetoothState() {
-			const state = await BluetoothStateManager.getState();
-			setState(state);
-		}
-
-		getDeviceBluetoothState();
-	}, []);
+	const getBluetoothState: () => Promise<BluetoothState> = () => {
+		return BluetoothStateManager.getState();
+	};
 
 	const requestToEnable = async (): Promise<Boolean> => {
 		return BluetoothStateManager.requestToEnable();
@@ -34,7 +27,12 @@ const useBluetoothState = (): useBluetoothStateAPI => {
 		BluetoothStateManager.disable();
 	};
 
-	return { state, requestToEnable, turnOffBluetooth, turnOnBluetooth };
+	return {
+		getBluetoothState,
+		requestToEnable,
+		turnOffBluetooth,
+		turnOnBluetooth,
+	};
 };
 
 export default useBluetoothState;

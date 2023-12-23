@@ -10,6 +10,7 @@ interface BluetoothLowEnergyApi {
 	allDevices: Device[];
 	requestPermissions(): Promise<boolean>;
 	scanForPeripherals(): void;
+	disconnectFromCurrentDevice: () => void;
 	connectToDevice: (deviceId: Device) => Promise<void>;
 	connectedDevice: Device | null;
 }
@@ -89,6 +90,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	// Quét các thiết bị ngoại vi
 	const scanForPeripherals = async () => {
+		setAllDevices([]);
 		bleManager.startDeviceScan(null, null, (error, device) => {
 			if (error) {
 				console.log(error);
@@ -124,6 +126,10 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 	};
 
+	const disconnectFromCurrentDevice = () => {
+		if (connectedDevice) bleManager.cancelDeviceConnection(connectedDevice?.id);
+	};
+
 	// Get last connected device
 	useEffect(() => {
 		async function tryGetLastDevice() {
@@ -147,6 +153,7 @@ function useBLE(): BluetoothLowEnergyApi {
 	return {
 		scanForPeripherals,
 		requestPermissions,
+		disconnectFromCurrentDevice,
 		allDevices,
 		connectToDevice,
 		connectedDevice,

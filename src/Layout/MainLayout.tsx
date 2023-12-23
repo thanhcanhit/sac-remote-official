@@ -4,6 +4,7 @@ import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet } from "react-native";
 import Header from "../components/Header";
+import { COLORS } from "../utils/color";
 
 type MainLayoutProps = {
 	children: React.ReactNode;

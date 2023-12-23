@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { Text, View } from "react-native-ui-lib";
 import FanSwitch from "../../components/FanSwitch";
 import StatusPane from "./StatusPane";
 import Setting from "./Setting";
+import ConnectStatus from "../../components/ConnectStatus";
 
 export type ServiceName = "temperature" | "humidity" | "battery";
 const Remote = () => {
-	const [power, setPower] = useState(() => true);
+	const [power, setPower] = useState(() => false);
 
 	const [currentActive, setCurrentActive] =
 		useState<ServiceName>("temperature");
@@ -15,35 +16,38 @@ const Remote = () => {
 	const [battery, setBattery] = useState<number>(100);
 
 	return (
-		<View flex>
-			<View flex-3>
-				<View row centerV>
+			<Fragment>
+				<ConnectStatus />
+						<View flex>
+				<View flex-3>
+					<View row centerV>
+						<View flex-3 left>
+							<Text text50>Trạng thái</Text>
+						</View>
+						<View flex-1 right>
+							<FanSwitch state={power} onPress={setPower} />
+						</View>
+					</View>
+					<View>
+						<StatusPane
+							currentActive={currentActive}
+							changeCurrentActive={setCurrentActive}
+							temperature={temperature}
+							humidity={humidity}
+							battery={battery}
+						/>
+					</View>
+				</View>
+				<View flex-2 marginT-32>
 					<View flex-3 left>
-						<Text text50>Trạng thái</Text>
+						<Text text50 marginB-8>
+							Thiết lập
+						</Text>
+						<Setting />
 					</View>
-					<View flex-1 right>
-						<FanSwitch state={power} onPress={setPower} />
-					</View>
 				</View>
-				<View>
-					<StatusPane
-						currentActive={currentActive}
-						changeCurrentActive={setCurrentActive}
-						temperature={temperature}
-						humidity={humidity}
-						battery={battery}
-					/>
-				</View>
-			</View>
-			<View flex-2 marginT-32>
-				<View flex-3 left>
-					<Text text50 marginB-8>
-						Thiết lập
-					</Text>
-					<Setting />
-				</View>
-			</View>
-		</View>
+						</View>
+			</Fragment>
 	);
 };
 
