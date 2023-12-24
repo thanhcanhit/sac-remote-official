@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import MainLayout from "./src/Layout/MainLayout";
+import MainLayout from "./src/layouts/MainLayout";
 import { Fragment, createContext } from "react";
 import { ThemeManager } from "react-native-ui-lib";
 import { COLORS } from "./src/utils/color";
@@ -10,7 +10,7 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 import Home from "./src/pages/Home";
 import Device from "./src/pages/Device";
 import Remote from "./src/pages/Remote";
-import BluetoothContextProvider from "./src/components/context/BluetoothContextProvider";
+import BluetoothContextProvider from "./src/contexts/BluetoothContextProvider";
 
 ThemeManager.setComponentTheme("Text", {
 	color: COLORS.TEXT_BLACK,

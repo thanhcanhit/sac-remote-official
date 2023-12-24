@@ -11,7 +11,7 @@ import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { COLORS } from "../../utils/color";
 import DeviceItem from "./DeviceItem";
 import { Device as DeviceType } from "react-native-ble-plx";
-import { BluetoothContext } from "../../components/context/BluetoothContextProvider";
+import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 
 type ToastVariant = "success" | "failure" | "general";
 const Device = () => {
