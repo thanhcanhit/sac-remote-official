@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ScrollBar, View } from "react-native-ui-lib";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import StatusProgress from "./StatusProgress";

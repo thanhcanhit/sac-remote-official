@@ -1,22 +1,24 @@
 /* eslint-disable no-bitwise */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { BleManager, Device } from "react-native-ble-plx";
 import localStorage, { STORAGE_KEY } from "../storage/localStorage";
 import * as ExpoDevice from "expo-device";
 import { useEffect } from "react";
 
-interface BluetoothLowEnergyApi {
+export interface BluetoothLowEnergyApi {
 	allDevices: Device[];
 	requestPermissions(): Promise<boolean>;
 	scanForPeripherals(): void;
 	disconnectFromCurrentDevice: () => void;
 	connectToDevice: (deviceId: Device) => Promise<void>;
+	lastDevice: Device | null;
 	connectedDevice: Device | null;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
 	const bleManager = useMemo(() => new BleManager(), []);
+	const lastDevice = useRef<Device | null>(null);
 
 	// Danh sách thiết bị đang quét
 	const [allDevices, setAllDevices] = useState<Device[]>([]);
@@ -112,22 +114,28 @@ function useBLE(): BluetoothLowEnergyApi {
 	const connectToDevice = async (device: Device) => {
 		try {
 			const deviceConnection = await bleManager.connectToDevice(device.id);
-			setConnectedDevice(deviceConnection);
-			await deviceConnection.discoverAllServicesAndCharacteristics();
-			bleManager.stopDeviceScan();
+			if (deviceConnection) {
+				setConnectedDevice(deviceConnection);
 
-			// Save device to local storage
-			localStorage.save({
-				key: STORAGE_KEY,
-				data: device.id,
-			});
+				await deviceConnection.discoverAllServicesAndCharacteristics();
+				bleManager.stopDeviceScan();
+
+				// Save device to local storage
+				localStorage.save({
+					key: STORAGE_KEY,
+					data: device,
+				});
+			}
 		} catch (e) {
 			console.log("Lỗi khi kết nối đến thiết bị: ", e);
 		}
 	};
 
-	const disconnectFromCurrentDevice = () => {
-		if (connectedDevice) bleManager.cancelDeviceConnection(connectedDevice?.id);
+	const disconnectFromCurrentDevice = async () => {
+		if (connectedDevice) {
+			await bleManager.cancelDeviceConnection(connectedDevice?.id);
+			setConnectedDevice(null);
+		}
 	};
 
 	// Get last connected device
@@ -137,17 +145,25 @@ function useBLE(): BluetoothLowEnergyApi {
 				const localData = await localStorage.load({ key: STORAGE_KEY });
 
 				if (localData) {
-					const id = localData;
-					const deviceConnection = await bleManager.connectToDevice(id);
-					setConnectedDevice(deviceConnection);
-					await deviceConnection.discoverAllServicesAndCharacteristics();
+					const savedDevice: Device = localData;
+					lastDevice.current = savedDevice;
+					await bleManager.connectToDevice(savedDevice.id);
 				}
 			} catch (e) {
 				console.log("Lỗi khi đọc dữ liệu cũ trước đó: " + e);
 			}
 		}
 
-		tryGetLastDevice();
+		if (!connectedDevice) tryGetLastDevice();
+	}, []);
+
+	// initial
+	useEffect(() => {
+		// handle state change
+		bleManager.onDeviceDisconnected(connectedDevice?.id || "", () => {
+			console.log("disconnect " + connectedDevice?.id);
+			setConnectedDevice(null);
+		});
 	}, []);
 
 	return {
@@ -157,6 +173,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		allDevices,
 		connectToDevice,
 		connectedDevice,
+		lastDevice: lastDevice?.current,
 	};
 }
 

@@ -1,31 +1,24 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { Switch } from "react-native-gesture-handler";
-import { ActionSheet, Button, Dialog, Text, View } from "react-native-ui-lib";
-import useBluetoothState from "./../../bluetooth/useBluetoothState";
-import useBLE from "./../../bluetooth/useBLE";
+import { ActionSheet, Button, Text, View } from "react-native-ui-lib";
 import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { COLORS } from "../../utils/color";
-import { BOX_SHADOW } from "../../utils/styles";
 import DeviceItem from "./DeviceItem";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Device as DeviceType } from "react-native-ble-plx";
+import { BluetoothContext } from "../../components/context/BluetoothContextProvider";
 
 const Device = () => {
+	const { getBluetoothState, requestToEnable } =
+		useContext(BluetoothContext)?.useBluetoothState;
 	const {
-		getBluetoothState,
-		requestToEnable,
-		turnOffBluetooth,
-		turnOnBluetooth,
-	} = useBluetoothState();
-	const {
+		lastDevice,
 		requestPermissions,
 		scanForPeripherals,
 		allDevices,
 		connectToDevice,
 		connectedDevice,
-		// heartRate,
 		disconnectFromCurrentDevice,
-	} = useBLE();
+	} = useContext(BluetoothContext)?.useBLE;
 
 	const [isTurnOnBluetooth, setIsTurnOnBluetooth] = useState<boolean>(false);
 	const [showNoNameDevice, setShowNoNameDevice] = useState<boolean>(false);
@@ -39,8 +32,8 @@ const Device = () => {
 		}
 	};
 
-	const handleConnect = (id: DeviceType) => {
-		connectToDevice(id);
+	const handleConnect = async (id: DeviceType) => {
+		await connectToDevice(id);
 	};
 
 	const handleDisconnect = () => {
@@ -58,7 +51,7 @@ const Device = () => {
 
 	// Initial
 	useEffect(() => {
-		const init = async () => {
+		async () => {
 			let isTurnOn: Boolean = (await getBluetoothState()) == "PoweredOn";
 			while (!isTurnOn) {
 				try {
@@ -68,8 +61,6 @@ const Device = () => {
 			}
 			scanForPeripherals();
 		};
-
-		setTimeout(init, 500);
 	}, []);
 
 	const listShowDevice = showNoNameDevice
@@ -78,17 +69,26 @@ const Device = () => {
 
 	return (
 		<View flex>
-			{connectedDevice && (
+			{(lastDevice || connectedDevice) && (
 				<View flex-1>
 					<View>
 						<Text text60 marginB-8>
-							Thiết bị đang kết nối hiện tại
+							Thiết bị đã kết nối trước đó
 						</Text>
-						<DeviceItem
-							device={connectedDevice}
-							isConnected
-							onPress={handleDisconnect}
-						/>
+						{connectedDevice ? (
+							<DeviceItem
+								device={connectedDevice}
+								isConnected
+								onPress={handleDisconnect}
+							/>
+						) : (
+							lastDevice && (
+								<DeviceItem
+									device={lastDevice}
+									onPress={() => handleConnect(lastDevice)}
+								/>
+							)
+						)}
 					</View>
 				</View>
 			)}
@@ -147,7 +147,7 @@ const Device = () => {
 									style={{ maxWidth: 200, textAlign: "center" }}
 								>
 									Hãy thử quét thiết bị lại nếu đợi quá lâu mà không có phản hồi
-									bạn nhé ❤️
+									bạn nhé
 								</Text>
 							</View>
 						)}
