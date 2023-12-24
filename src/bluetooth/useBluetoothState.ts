@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import BluetoothStateManager, {
 	BluetoothState,
 } from "react-native-bluetooth-state-manager";
@@ -28,9 +28,19 @@ const useBluetoothState = (): useBluetoothStateAPI => {
 	};
 
 	useEffect(() => {
+		// Add listener
+		BluetoothStateManager.onStateChange(async (state) => {
+			let isTurnOff: Boolean | boolean = state === "PoweredOff";
+			if (isTurnOff) {
+				while (isTurnOff) {
+					isTurnOff = await requestToEnable();
+				}
+			}
+		}, true);
+
 		const checkBluetoothState = async () => {
 			if ((await getBluetoothState()) !== "PoweredOn") {
-				requestToEnable();
+				await requestToEnable();
 			}
 		};
 		checkBluetoothState();

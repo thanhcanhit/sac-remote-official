@@ -1,12 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Switch } from "react-native-gesture-handler";
-import { ActionSheet, Button, Text, View } from "react-native-ui-lib";
+import {
+	ActionSheet,
+	Button,
+	Incubator,
+	Text,
+	View,
+} from "react-native-ui-lib";
 import { ActivityIndicator, ScrollView, StyleSheet } from "react-native";
 import { COLORS } from "../../utils/color";
 import DeviceItem from "./DeviceItem";
 import { Device as DeviceType } from "react-native-ble-plx";
 import { BluetoothContext } from "../../components/context/BluetoothContextProvider";
 
+type ToastVariant = "success" | "failure" | "general";
 const Device = () => {
 	const { getBluetoothState, requestToEnable } =
 		useContext(BluetoothContext)?.useBluetoothState;
@@ -22,6 +29,15 @@ const Device = () => {
 
 	const [isTurnOnBluetooth, setIsTurnOnBluetooth] = useState<boolean>(false);
 	const [showNoNameDevice, setShowNoNameDevice] = useState<boolean>(false);
+	const [toast, setToast] = useState<{
+		show: boolean;
+		message: string;
+		variant: ToastVariant;
+	}>({
+		show: false,
+		message: "",
+		variant: "general",
+	});
 	const [showDetailModal, setShowDetailModal] = useState<boolean>(false);
 	const selectedDevice = useRef<DeviceType | null>(null);
 
@@ -33,25 +49,26 @@ const Device = () => {
 	};
 
 	const handleConnect = async (id: DeviceType) => {
-		await connectToDevice(id);
+		try {
+			await connectToDevice(id);
+			showToast("Đã kết nối với " + id.name, "success");
+		} catch (e) {
+			showToast("Không thể kết nối: " + e, "failure");
+		}
 	};
 
 	const handleDisconnect = () => {
 		disconnectFromCurrentDevice();
+		showToast("Đã ngắt kết nối thiết bị", "general");
 	};
 
-	useEffect(() => {
-		const requestTurnOnBluetooth = async () => {
-			const result = await requestToEnable();
-			console.log(result);
-		};
-
-		requestTurnOnBluetooth();
-	}, []);
+	const showToast = (message: string, variant?: ToastVariant) => {
+		setToast({ message, show: true, variant: variant ? variant : "general" });
+	};
 
 	// Initial
 	useEffect(() => {
-		async () => {
+		const initial = async () => {
 			let isTurnOn: Boolean = (await getBluetoothState()) == "PoweredOn";
 			while (!isTurnOn) {
 				try {
@@ -61,6 +78,8 @@ const Device = () => {
 			}
 			scanForPeripherals();
 		};
+
+		initial();
 	}, []);
 
 	const listShowDevice = showNoNameDevice
@@ -232,6 +251,20 @@ const Device = () => {
 				]}
 				visible={showDetailModal}
 			></ActionSheet>
+
+			<Incubator.Toast
+				message={toast.message}
+				visible={toast.show}
+				preset={toast.variant}
+				centerMessage
+				swipeable
+				position={"bottom"}
+				backgroundColor={COLORS.WHITE}
+				autoDismiss={2000}
+				onDismiss={() =>
+					setToast({ message: "", show: false, variant: "general" })
+				}
+			/>
 		</View>
 	);
 };
