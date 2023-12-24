@@ -26,31 +26,13 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	const requestAndroid31Permissions = async () => {
 		const bluetoothScanPermission = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-			{
-				title: "Bluetooth Scan Permission",
-				message: "Ứng dụng này cần quét các thiết bị bluetooth xung quanh bạn",
-				buttonPositive: "Đồng ý",
-				buttonNegative: "Từ chối",
-			}
+			PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
 		);
 		const bluetoothConnectPermission = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-			{
-				title: "Bluetooth Connect Permission",
-				message: "Ứng dụng này cần kết nối đến thiết bị bluetooth của bạn",
-				buttonPositive: "Đồng ý",
-				buttonNegative: "Từ chối",
-			}
+			PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT
 		);
 		const fineLocationPermission = await PermissionsAndroid.request(
-			PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-			{
-				title: "Location Permission",
-				message: "Ứng dụng cần quyền truy cập fine location",
-				buttonPositive: "Đồng ý",
-				buttonNegative: "Từ chối",
-			}
+			PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
 		);
 
 		return (
@@ -64,13 +46,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		if (Platform.OS === "android") {
 			if ((ExpoDevice.platformApiLevel ?? -1) < 31) {
 				const permissionStatus = await PermissionsAndroid.request(
-					PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-					{
-						title: "Location Permission",
-						message: "Ứng dụng cần quyền truy cập fine location",
-						buttonPositive: "Đồng ý",
-						buttonNegative: "Từ chối",
-					}
+					PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
 				);
 
 				return permissionStatus == "granted";
@@ -110,6 +86,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		const deviceConnection = await bleManager.connectToDevice(device.id);
 		if (deviceConnection) {
 			setConnectedDevice(deviceConnection);
+			lastDevice.current = deviceConnection;
 
 			await deviceConnection.discoverAllServicesAndCharacteristics();
 			bleManager.stopDeviceScan();
@@ -131,6 +108,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	// initial
 	useEffect(() => {
+
 		// handle state change
 		bleManager.onDeviceDisconnected(connectedDevice?.id || "", () => {
 			console.log("disconnect " + connectedDevice?.id);
