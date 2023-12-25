@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { Text, TouchableOpacity, View } from "react-native-ui-lib";
@@ -7,6 +7,7 @@ import LinearGradientView from "../../components/LinearGradientView";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS } from "./../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
+import storage, { USER_INFO_KEY } from "../../storage/storage";
 
 const RemoteIcon = (
 	<MaterialCommunityIcon name="remote" size={40} color={COLORS.WHITE} />
@@ -16,15 +17,28 @@ type homeScreenProp = DrawerNavigationProp<RootDrawerParamList, "Home">;
 
 const Home = () => {
 	const navigation = useNavigation<homeScreenProp>();
+	const [userName, setUserName] = useState<string>("Người dùng không tên");
 
 	const moveToRemotePage = () => {
 		navigation.navigate("Remote");
 	};
 
+	useEffect(() => {
+		const getUserInfo = async () => {
+			try {
+				const name = await storage.load({ key: USER_INFO_KEY });
+				if (name) {
+					setUserName(name);
+				}
+			} catch (e) {}
+		};
+
+		getUserInfo();
+	}, []);
 	return (
 		<View flex marginT-16>
 			<View marginB-24>
-				<Text text40>Xin chào, Thanh Cảnh</Text>
+				<Text text40>Xin chào, {userName}</Text>
 				<Text text70T color={COLORS.SECONDARY}>
 					SAC chúc bạn một ngày mới tốt lành ❤️
 				</Text>

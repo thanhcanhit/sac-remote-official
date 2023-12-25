@@ -1,7 +1,8 @@
 import Storage from "react-native-storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export const STORAGE_KEY = "THANHCANHITSTORAGE";
+export const LAST_ITEM_KEY = "SACLASTDEVICE";
+export const USER_INFO_KEY = "SACUSERINFO";
 
 const storage = new Storage({
 	// maximum capacity, default 1000 key-ids

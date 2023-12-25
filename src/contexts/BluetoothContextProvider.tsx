@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useEffect } from "react";
 import useBLE, { BluetoothLowEnergyApi } from "../bluetooth/useBLE";
 import useBluetoothState, {
 	useBluetoothStateAPI,
@@ -22,6 +22,14 @@ const BluetoothContextProvider = ({
 		useBLE: useBLE(),
 		useBluetoothState: useBluetoothState(),
 	};
+
+	useEffect(() => {
+		const getPermission = async () => {
+			contextValue.useBLE.requestPermissions();
+		};
+
+		getPermission();
+	}, []);
 	return (
 		<BluetoothContext.Provider value={contextValue}>
 			{children}

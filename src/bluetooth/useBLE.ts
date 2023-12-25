@@ -2,7 +2,7 @@
 import { useMemo, useRef, useState } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
 import { BleManager, Device } from "react-native-ble-plx";
-import localStorage, { STORAGE_KEY } from "../storage/localStorage";
+import localStorage, { LAST_ITEM_KEY } from "../storage/storage";
 import * as ExpoDevice from "expo-device";
 import { useEffect } from "react";
 
@@ -93,7 +93,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 			// Save device to local storage
 			localStorage.save({
-				key: STORAGE_KEY,
+				key: LAST_ITEM_KEY,
 				data: device,
 			});
 		}
@@ -108,7 +108,6 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	// initial
 	useEffect(() => {
-
 		// handle state change
 		bleManager.onDeviceDisconnected(connectedDevice?.id || "", () => {
 			console.log("disconnect " + connectedDevice?.id);
@@ -118,7 +117,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		// get last device in local storage
 		async function tryGetLastDevice() {
 			try {
-				const localData = await localStorage.load({ key: STORAGE_KEY });
+				const localData = await localStorage.load({ key: LAST_ITEM_KEY });
 
 				if (localData) {
 					const savedDevice: Device = localData;
