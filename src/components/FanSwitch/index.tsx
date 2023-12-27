@@ -1,12 +1,13 @@
-import React, { useState, useEffect, SetStateAction } from "react";
-import {
+import React, { useEffect } from "react";
+import Animated, {
 	withSpring,
 	useAnimatedStyle,
 	useSharedValue,
 } from "react-native-reanimated";
-import { AnimatedImage, View, TouchableOpacity } from "react-native-ui-lib";
+import { TouchableOpacity } from "react-native-ui-lib";
 import { COLORS } from "../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
+import FanSVG from "../../assets/svgs/fan.svg";
 
 type FanSwitchProps = {
 	state: boolean;
@@ -44,20 +45,16 @@ const FanSwitch = ({ state, onPress: onChange }: FanSwitchProps) => {
 			backgroundColor={COLORS.WHITE}
 			style={BOX_SHADOW.SMALL}
 		>
-			<View padding-4 row>
-				<AnimatedImage
-					source={require("../../assets/imgs/fan.png")}
-					style={[
-						{
-							width: 40,
-							height: 40,
-						},
-						animatedStyles,
-					]}
-					alt="Fan"
-				/>
-				<View />
-			</View>
+			<Animated.View
+				style={[
+					{
+						padding: 4,
+					},
+					animatedStyles,
+				]}
+			>
+				<FanSVG width={40} height={40} color={COLORS.PRIMARY} />
+			</Animated.View>
 		</TouchableOpacity>
 	);
 };

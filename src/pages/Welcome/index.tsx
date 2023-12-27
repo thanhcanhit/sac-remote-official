@@ -15,6 +15,11 @@ import WelcomePage from "./WelcomePage";
 import IntroStatus from "./IntroStatus";
 import IntroSetting from "./IntroSetting";
 import GetNamePage from "./GetNamePage";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { RootDrawerParamList } from "../../../App";
+import { useNavigation } from "@react-navigation/native";
+
+type welcomeScreenProp = DrawerNavigationProp<RootDrawerParamList, "Welcome">;
 
 export type StepType = {
 	onPress: VoidFunction;
@@ -30,7 +35,10 @@ const steps: { [key: number]: (props: StepType) => React.JSX.Element } = {
 };
 const stepsNum = 4;
 
-const Welcome = ({ onFinish }: { onFinish: VoidFunction }) => {
+const Welcome = () => {
+	// Navigation
+	const navigation = useNavigation<welcomeScreenProp>();
+
 	const [active, setActive] = useState<number>(0);
 	const slideAnim = useRef(new Animated.Value(0)).current;
 	const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -54,6 +62,10 @@ const Welcome = ({ onFinish }: { onFinish: VoidFunction }) => {
 			if (active < 3) setActive((prev) => prev + 1);
 		}, 100);
 		slideToLeft();
+	};
+
+	const handleFinish = () => {
+		navigation.navigate("Home");
 	};
 
 	useEffect(() => {
@@ -121,7 +133,7 @@ const Welcome = ({ onFinish }: { onFinish: VoidFunction }) => {
 			>
 				{
 					<ActivePage
-						onPress={active + 1 === stepsNum ? onFinish : nextPage}
+						onPress={active + 1 === stepsNum ? handleFinish : nextPage}
 						x={position.x}
 						y={position.y}
 					/>

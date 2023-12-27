@@ -1,4 +1,4 @@
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import MainLayout from "./src/layouts/MainLayout";
@@ -7,6 +7,7 @@ import {
 	createContext,
 	useEffect,
 	useLayoutEffect,
+	useRef,
 	useState,
 } from "react";
 import { LoaderScreen, ThemeManager } from "react-native-ui-lib";
@@ -25,10 +26,13 @@ ThemeManager.setComponentTheme("Text", {
 });
 
 export type RootDrawerParamList = {
+	Welcome: undefined;
 	Home: undefined;
 	Device: undefined;
 	Remote: undefined;
 };
+
+const WelcomePage = () => <Welcome />;
 
 const HomePage = () => (
 	<MainLayout>
@@ -50,74 +54,57 @@ const RemotePage = () => (
 const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 export default function App() {
-	const [isFirstTimeLogin, setIsFirstTimeLogin] = useState<boolean | null>(
-		null
-	);
-
-	useLayoutEffect(() => {
-		const getUserInfo = async () => {
-			try {
-				const name = await storage.load({ key: USER_INFO_KEY });
-				if (name) {
-					setIsFirstTimeLogin(false);
-				}
-			} catch (e) {
-				setIsFirstTimeLogin(true);
-			}
-		};
-
-		getUserInfo();
-	}, []);
-
 	return (
 		<BluetoothContextProvider>
-			{isFirstTimeLogin === null ? (
-				<LoaderScreen color={COLORS.PRIMARY} />
-			) : isFirstTimeLogin ? (
-				<Welcome onFinish={() => setIsFirstTimeLogin(false)} />
-			) : (
-				<NavigationContainer>
-					<Drawer.Navigator
-						initialRouteName="Home"
-						screenOptions={{ header: () => <Fragment /> }}
-					>
-						<Drawer.Screen
-							name="Home"
-							component={HomePage}
-							options={{
-								title: "Trang chủ",
-								drawerIcon: ({ color, size }) => (
-									<FeatherIcon size={size} color={color} name="home" />
-								),
-							}}
-						/>
-						<Drawer.Screen
-							name="Remote"
-							component={RemotePage}
-							options={{
-								title: "Bảng điểu khiển",
-								drawerIcon: ({ color, size }) => (
-									<MaterialCommunityIcon
-										size={size}
-										color={color}
-										name="remote"
-									/>
-								),
-							}}
-						/>
-						<Drawer.Screen
-							name="Device"
-							component={DevicePage}
-							options={{
-								title: "Quản lí thiết bị",
-								drawerIcon: ({ color, size }) => (
-									<FeatherIcon size={size} color={color} name="bluetooth" />
-								),
-							}}
-						/>
-					</Drawer.Navigator>
-				</NavigationContainer>
-			)}
+			<NavigationContainer>
+				<Drawer.Navigator
+					initialRouteName={"Home"}
+					screenOptions={{ header: () => <Fragment /> }}
+				>
+					<Drawer.Screen
+						name="Welcome"
+						component={WelcomePage}
+						options={{
+							title: undefined,
+							drawerItemStyle: { height: 0 },
+						}}
+					/>
+					<Drawer.Screen
+						name="Home"
+						component={HomePage}
+						options={{
+							title: "Trang chủ",
+							drawerIcon: ({ color, size }) => (
+								<FeatherIcon size={size} color={color} name="home" />
+							),
+						}}
+					/>
+					<Drawer.Screen
+						name="Remote"
+						component={RemotePage}
+						options={{
+							title: "Bảng điểu khiển",
+							drawerIcon: ({ color, size }) => (
+								<MaterialCommunityIcon
+									size={size}
+									color={color}
+									name="remote"
+								/>
+							),
+						}}
+					/>
+					<Drawer.Screen
+						name="Device"
+						component={DevicePage}
+						options={{
+							title: "Quản lí thiết bị",
+							drawerIcon: ({ color, size }) => (
+								<FeatherIcon size={size} color={color} name="bluetooth" />
+							),
+						}}
+					/>
+				</Drawer.Navigator>
+			</NavigationContainer>
 		</BluetoothContextProvider>
 	);
 }
