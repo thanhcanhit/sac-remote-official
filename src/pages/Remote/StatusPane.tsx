@@ -3,10 +3,10 @@ import { ScrollBar, View } from "react-native-ui-lib";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import StatusProgress from "./StatusProgress";
 import ServiceButton from "./ServiceButton";
-import { ServiceName } from ".";
+import { InfoCharacterisctic } from ".";
 
 const serviceList: {
-	id: ServiceName;
+	id: InfoCharacterisctic;
 	label: string;
 	icon: React.ReactElement;
 }[] = [
@@ -28,8 +28,8 @@ const serviceList: {
 ];
 
 type StatusPaneProps = {
-	currentActive: ServiceName;
-	changeCurrentActive: (serviceId: ServiceName) => void;
+	currentActive: InfoCharacterisctic;
+	changeCurrentActive: (serviceId: InfoCharacterisctic) => void;
 	temperature: number;
 	humidity: number;
 	battery: number;

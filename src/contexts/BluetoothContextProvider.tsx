@@ -24,8 +24,21 @@ const BluetoothContextProvider = ({
 	};
 
 	useEffect(() => {
+		const requestTurnOnBluetooth = async () => {
+			if (
+				(await contextValue.useBluetoothState.getBluetoothState()) !==
+				"PoweredOn"
+			) {
+				await contextValue.useBluetoothState.requestToEnable();
+			}
+		};
+
 		const getPermission = async () => {
-			contextValue.useBLE.requestPermissions();
+			const isGrandted: boolean =
+				await contextValue.useBLE.requestPermissions();
+			if (isGrandted) {
+				requestTurnOnBluetooth();
+			}
 		};
 
 		getPermission();

@@ -4,7 +4,7 @@ import { COLORS } from "../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
 import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet } from "react-native";
-import { ServiceName } from ".";
+import { InfoCharacterisctic } from ".";
 import BatteryBar from "../../components/BatteryBar";
 
 const ServiceButton = ({
@@ -15,7 +15,7 @@ const ServiceButton = ({
 	value,
 	onPress,
 }: {
-	id: ServiceName;
+	id: InfoCharacterisctic;
 	name: string;
 	icon: React.ReactElement;
 	isActive: boolean;

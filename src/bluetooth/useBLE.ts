@@ -28,14 +28,12 @@ const SAC_BLE_SERVICES_UUID = {
 	},
 };
 
-// const rawData = base64.decode(characteristic.value);
-
 export interface BluetoothLowEnergyApi {
 	allDevices: Device[];
 	requestPermissions(): Promise<boolean>;
 	scanForPeripherals(): void;
 	disconnectFromCurrentDevice: () => void;
-	connectToDevice: (deviceId: Device) => Promise<void>;
+	connectToDevice: (deviceId: Device) => Promise<boolean>;
 	lastDevice: Device | null;
 	connectedDevice: Device | null;
 	power: boolean;
@@ -46,6 +44,7 @@ export interface BluetoothLowEnergyApi {
 	settingTemp: number[];
 	setNewSettingHumi: (value: number[]) => void;
 	setNewSettingTemp: (value: number[]) => void;
+	setControl: (newValue: boolean) => void;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -58,9 +57,9 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	// Characteristics
 	const [power, setPower] = useState<boolean>(false);
-	const [temperature, setTemperature] = useState<number>(0);
-	const [humidity, setHumidity] = useState<number>(0);
-	const [battery, setBattery] = useState<number>(0);
+	const [temperature, setTemperature] = useState<number>(20);
+	const [humidity, setHumidity] = useState<number>(50);
+	const [battery, setBattery] = useState<number>(100);
 	const [settingTemp, setSettingTemp] = useState<number[]>([0, 100]);
 	const [settingHumi, setsettingHumi] = useState<number[]>([0, 100]);
 
@@ -122,9 +121,21 @@ function useBLE(): BluetoothLowEnergyApi {
 		});
 	};
 
-	const connectToDevice = async (device: Device) => {
+	const connectToDevice = async (device: Device): Promise<boolean> => {
 		const deviceConnection = await bleManager.connectToDevice(device.id);
 		if (deviceConnection) {
+			// Check is sac device
+			const deviceServices = await deviceConnection.services();
+			const hasInfoService =
+				deviceServices.findIndex(
+					(service) => service.uuid == SAC_BLE_SERVICES_UUID.infoService.uuid
+				) != -1;
+			const hasSettingService =
+				deviceServices.findIndex(
+					(service) => service.uuid == SAC_BLE_SERVICES_UUID.settingService.uuid
+				) != -1;
+			if (!hasInfoService || !hasSettingService) return false;
+
 			setConnectedDevice(deviceConnection);
 			lastDevice.current = deviceConnection;
 
@@ -136,7 +147,9 @@ function useBLE(): BluetoothLowEnergyApi {
 				key: LAST_ITEM_KEY,
 				data: device,
 			});
+			return true;
 		}
+		return false;
 	};
 
 	const disconnectFromCurrentDevice = async () => {
@@ -150,6 +163,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		return connectedDevice !== null;
 	};
 
+	// *** Service & characteristic using ***
 	const updatePower = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -161,6 +175,7 @@ function useBLE(): BluetoothLowEnergyApi {
 			setPower(value);
 		}
 	};
+
 	const updateTemperature = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -172,6 +187,7 @@ function useBLE(): BluetoothLowEnergyApi {
 			setTemperature(value);
 		}
 	};
+
 	const updateHumidity = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -183,6 +199,7 @@ function useBLE(): BluetoothLowEnergyApi {
 			setHumidity(value);
 		}
 	};
+
 	const updateBattery = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -195,7 +212,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 	};
 
-	// Chú ý dữ liệu gửi lên
 	const updateSettingTemp = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -208,6 +224,7 @@ function useBLE(): BluetoothLowEnergyApi {
 			setSettingTemp(value);
 		}
 	};
+
 	const updateSettingHumi = async () => {
 		if (isConnected()) {
 			const characteristic =
@@ -231,6 +248,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 		return;
 	};
+
 	const setNewSettingHumi: (newValue: number[]) => void = async (newValue) => {
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
@@ -243,12 +261,29 @@ function useBLE(): BluetoothLowEnergyApi {
 		return;
 	};
 
+	const setControl: (newValue: boolean) => void = async (newValue) => {
+		if (isConnected()) {
+			await connectedDevice?.writeCharacteristicWithoutResponseForService(
+				SAC_BLE_SERVICES_UUID.settingService.uuid,
+				SAC_BLE_SERVICES_UUID.settingService.characteristics.control,
+				base64.encode(JSON.stringify(newValue))
+			);
+
+			setPower(newValue);
+		}
+		return;
+	};
+
 	// initial
 	useEffect(() => {
-		requestPermissions();
+		const request = async () => {
+			await requestPermissions();
+		};
+
+		request();
+
 		// handle state change
 		bleManager.onDeviceDisconnected(connectedDevice?.id || "", () => {
-			console.log("disconnect " + connectedDevice?.id);
 			setConnectedDevice(null);
 		});
 
@@ -262,9 +297,7 @@ function useBLE(): BluetoothLowEnergyApi {
 					lastDevice.current = savedDevice;
 					await connectToDevice(savedDevice);
 				}
-			} catch (e) {
-				console.log("Lỗi khi sử dụng dữ liệu đã lưu: " + e);
-			}
+			} catch (e) {}
 		}
 
 		if (!connectedDevice) tryGetLastDevice();
@@ -314,6 +347,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		settingTemp,
 		setNewSettingHumi,
 		setNewSettingTemp,
+		setControl,
 	};
 }
 

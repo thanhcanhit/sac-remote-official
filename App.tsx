@@ -2,15 +2,8 @@ import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import "react-native-gesture-handler";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import MainLayout from "./src/layouts/MainLayout";
-import {
-	Fragment,
-	createContext,
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from "react";
-import { LoaderScreen, ThemeManager } from "react-native-ui-lib";
+import { Fragment } from "react";
+import { ThemeManager } from "react-native-ui-lib";
 import { COLORS } from "./src/utils/color";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import FeatherIcon from "react-native-vector-icons/Feather";
@@ -19,7 +12,6 @@ import Device from "./src/pages/Device";
 import Remote from "./src/pages/Remote";
 import BluetoothContextProvider from "./src/contexts/BluetoothContextProvider";
 import Welcome from "./src/pages/Welcome";
-import storage, { USER_INFO_KEY } from "./src/storage/storage";
 
 ThemeManager.setComponentTheme("Text", {
 	color: COLORS.TEXT_BLACK,
@@ -55,8 +47,8 @@ const Drawer = createDrawerNavigator<RootDrawerParamList>();
 
 export default function App() {
 	return (
-		<BluetoothContextProvider>
-			<NavigationContainer>
+		<NavigationContainer>
+			<BluetoothContextProvider>
 				<Drawer.Navigator
 					initialRouteName={"Home"}
 					screenOptions={{ header: () => <Fragment /> }}
@@ -104,7 +96,7 @@ export default function App() {
 						}}
 					/>
 				</Drawer.Navigator>
-			</NavigationContainer>
-		</BluetoothContextProvider>
+			</BluetoothContextProvider>
+		</NavigationContainer>
 	);
 }

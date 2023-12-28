@@ -29,15 +29,15 @@ const Home = () => {
 				const name = await storage.load({ key: USER_INFO_KEY });
 				if (name) {
 					setUserName(name);
-				} else {
-					navigation.navigate("Welcome");
 				}
-			} catch (e) {}
+			} catch (e) {
+				navigation.navigate("Welcome");
+			}
 		};
 
 		getUserInfo();
 	}, []);
-	
+
 	return (
 		<View flex marginT-16>
 			<View marginB-24>

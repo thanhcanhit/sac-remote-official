@@ -1,4 +1,4 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useContext, useRef, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import {
 	ActionSheet,
@@ -10,7 +10,8 @@ import {
 } from "react-native-ui-lib";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS } from "../../utils/color";
-import { ServiceName } from ".";
+import { InfoCharacterisctic } from ".";
+import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 
 type SettingState = {
 	min: number;
@@ -18,19 +19,21 @@ type SettingState = {
 };
 
 const Setting = () => {
-	const [currentSetting, setCurrentSetting] = useState<ServiceName>();
+	const { setNewSettingHumi, setNewSettingTemp, settingHumi, settingTemp } =
+		useContext(BluetoothContext).useBLE;
+	const [currentSetting, setCurrentSetting] = useState<InfoCharacterisctic>();
 	const [slider, setSlider] = useState<SettingState>({ min: 0, max: 100 });
 	const timer = useRef<NodeJS.Timeout>();
 	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-	const [tempSetting, setTempSetting] = useState<SettingState>({
-		min: 0,
-		max: 0,
-	});
-	const [humiditySetting, setHumiditySetting] = useState<SettingState>({
-		min: 0,
-		max: 0,
-	});
+	const tempSetting: SettingState = {
+		min: settingTemp[0] | 0,
+		max: settingTemp[0] | 100,
+	};
+	const humiditySetting: SettingState = {
+		min: settingHumi[0] | 0,
+		max: settingHumi[0] | 100,
+	};
 
 	const toggleActionSheet = () => {
 		setIsModalOpen(!isModalOpen);
@@ -116,9 +119,9 @@ const Setting = () => {
 
 	const onSubmit = () => {
 		if (currentSetting == "temperature") {
-			setTempSetting(slider);
+			setNewSettingTemp([slider.min, slider.max]);
 		} else if (currentSetting == "humidity") {
-			setHumiditySetting(slider);
+			setNewSettingHumi([slider.min, slider.max]);
 		}
 		toggleActionSheet();
 	};

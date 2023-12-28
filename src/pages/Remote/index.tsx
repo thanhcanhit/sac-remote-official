@@ -1,18 +1,20 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Text, View } from "react-native-ui-lib";
 import FanSwitch from "../../components/FanSwitch";
 import StatusPane from "./StatusPane";
 import Setting from "./Setting";
+import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 
-export type ServiceName = "temperature" | "humidity" | "battery";
+export type InfoCharacterisctic = "temperature" | "humidity" | "battery";
 const Remote = () => {
-	const [power, setPower] = useState(() => false);
-
+	const { battery, humidity, power, temperature, setControl } =
+		useContext(BluetoothContext).useBLE;
 	const [currentActive, setCurrentActive] =
-		useState<ServiceName>("temperature");
-	const [temperature, setTemperature] = useState<number>(23);
-	const [humidity, setHumidity] = useState<number>(65);
-	const [battery, setBattery] = useState<number>(100);
+		useState<InfoCharacterisctic>("temperature");
+
+	const togglePower = () => {
+		setControl(!power);
+	};
 
 	return (
 		<View flex>
@@ -22,7 +24,7 @@ const Remote = () => {
 						<Text text50>Trạng thái</Text>
 					</View>
 					<View flex-1 right>
-						<FanSwitch state={power} onPress={setPower} />
+						<FanSwitch state={power} onPress={togglePower} />
 					</View>
 				</View>
 				<View>

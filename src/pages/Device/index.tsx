@@ -27,7 +27,6 @@ const Device = () => {
 		disconnectFromCurrentDevice,
 	} = useContext(BluetoothContext)?.useBLE;
 
-	const [isTurnOnBluetooth, setIsTurnOnBluetooth] = useState<boolean>(false);
 	const [showNoNameDevice, setShowNoNameDevice] = useState<boolean>(false);
 	const [toast, setToast] = useState<{
 		show: boolean;
@@ -50,10 +49,13 @@ const Device = () => {
 
 	const handleConnect = async (id: DeviceType) => {
 		try {
-			await connectToDevice(id);
-			showToast("Đã kết nối với " + id.name, "success");
+			const isConnected = await connectToDevice(id);
+			if (isConnected) showToast("Đã kết nối với " + id.name, "success");
 		} catch (e) {
-			showToast("Không thể kết nối: " + e, "failure");
+			showToast(
+				"Không thể kết nối đến thiết bị, đảm bảo rằng đây là thiết bị của SAC",
+				"failure"
+			);
 		}
 	};
 
@@ -73,7 +75,6 @@ const Device = () => {
 			while (!isTurnOn) {
 				try {
 					isTurnOn = await requestToEnable();
-					setIsTurnOnBluetooth(isTurnOn.valueOf());
 				} catch {}
 			}
 			scanForPeripherals();
