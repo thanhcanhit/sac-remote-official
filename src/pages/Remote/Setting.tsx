@@ -8,10 +8,10 @@ import {
 	Text,
 	View,
 } from "react-native-ui-lib";
+import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS } from "../../utils/color";
 import { InfoCharacterisctic } from ".";
-import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 
 type SettingState = {
 	min: number;

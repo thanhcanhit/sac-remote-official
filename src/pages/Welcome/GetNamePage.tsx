@@ -1,10 +1,10 @@
+import { useState } from "react";
 import { Button, Text, TextField, View } from "react-native-ui-lib";
-import { StepType } from ".";
 import { Animated, KeyboardAvoidingView } from "react-native";
 import { COLORS } from "../../utils/color";
-import ChatSVG from "../../assets/svgs/chat.svg";
-import { useState } from "react";
+import { StepType } from ".";
 import storage, { USER_INFO_KEY } from "../../storage/storage";
+import ChatSVG from "../../assets/svgs/chat.svg";
 
 const GetNamePage = ({ onPress, x, y }: StepType) => {
 	const [name, setName] = useState<string>("");

@@ -1,23 +1,20 @@
 import React, {
-	Fragment,
 	useEffect,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from "react";
-import { Button, Text, TextField, View } from "react-native-ui-lib";
-import { COLORS } from "../../utils/color";
-import { KeyboardAvoidingView, SafeAreaView } from "react-native";
-import localStorage, { USER_INFO_KEY } from "../../storage/storage";
+import { Text, View } from "react-native-ui-lib";
 import { Animated } from "react-native";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
+import { useNavigation } from "@react-navigation/native";
+import { RootDrawerParamList } from "../../../App";
+import { COLORS } from "../../utils/color";
 import WelcomePage from "./WelcomePage";
 import IntroStatus from "./IntroStatus";
 import IntroSetting from "./IntroSetting";
 import GetNamePage from "./GetNamePage";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
-import { RootDrawerParamList } from "../../../App";
-import { useNavigation } from "@react-navigation/native";
 
 type welcomeScreenProp = DrawerNavigationProp<RootDrawerParamList, "Welcome">;
 

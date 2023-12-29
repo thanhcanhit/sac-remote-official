@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { Button, View } from "react-native-ui-lib";
+import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS } from "../../utils/color";
-import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 const BluetoothConnectedIcon = () => (
 	<MaterialIcon name="bluetooth-connected" size={20} color={COLORS.WHITE} />
 );

@@ -8,6 +8,7 @@ import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIc
 import { COLORS } from "./../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
 import storage, { USER_INFO_KEY } from "../../storage/storage";
+import ProductCarousel from "./ProductCarousel";
 
 const RemoteIcon = (
 	<MaterialCommunityIcon name="remote" size={40} color={COLORS.WHITE} />
@@ -17,7 +18,7 @@ type homeScreenProp = DrawerNavigationProp<RootDrawerParamList, "Home">;
 
 const Home = () => {
 	const navigation = useNavigation<homeScreenProp>();
-	const [userName, setUserName] = useState<string>("Người dùng không tên");
+	const [userName, setUserName] = useState<string>("Người dùng");
 
 	const moveToRemotePage = () => {
 		navigation.navigate("Remote");
@@ -47,7 +48,7 @@ const Home = () => {
 				</Text>
 			</View>
 			<TouchableOpacity
-				marginB-24
+				marginB-8
 				br40
 				style={[{ height: 150, overflow: "hidden" }, BOX_SHADOW.NORMAL]}
 				onPress={moveToRemotePage}
@@ -67,6 +68,7 @@ const Home = () => {
 					</View>
 				</LinearGradientView>
 			</TouchableOpacity>
+			<ProductCarousel />
 			<View>
 				<Text text80 color={COLORS.SECONDARY}>
 					Các tính năng khác đang phát triển...

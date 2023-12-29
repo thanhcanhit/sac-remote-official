@@ -1,11 +1,11 @@
 import React from "react";
+import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { Button, View } from "react-native-ui-lib";
 import { ICON_COLORS } from "../../utils/color";
-import SimpleLineIcon from "react-native-vector-icons/SimpleLineIcons";
 import { RootDrawerParamList } from "../../../App";
-import { DrawerNavigationProp } from "@react-navigation/drawer";
 import ConnectStatus from "../ConnectStatus";
+import SimpleLineIcon from "react-native-vector-icons/SimpleLineIcons";
 
 const MenuIcon = () => (
 	<SimpleLineIcon name="menu" size={25} color={ICON_COLORS.DEFAULT} />

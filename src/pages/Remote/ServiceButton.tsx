@@ -1,11 +1,11 @@
 import React from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { StyleSheet } from "react-native";
 import { Text, TouchableOpacity, View } from "react-native-ui-lib";
 import { COLORS } from "../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
-import { LinearGradient } from "expo-linear-gradient";
-import { StyleSheet } from "react-native";
-import { InfoCharacterisctic } from ".";
 import BatteryBar from "../../components/BatteryBar";
+import { InfoCharacterisctic } from ".";
 
 const ServiceButton = ({
 	id,
