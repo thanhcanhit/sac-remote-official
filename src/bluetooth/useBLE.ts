@@ -1,11 +1,15 @@
 /* eslint-disable no-bitwise */
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { PermissionsAndroid, Platform } from "react-native";
-import { BleManager, Device } from "react-native-ble-plx";
-import localStorage, { LAST_ITEM_KEY } from "../storage/storage";
+import {
+	BleError,
+	BleManager,
+	Characteristic,
+	Device,
+} from "react-native-ble-plx";
 import * as ExpoDevice from "expo-device";
-import { useEffect } from "react";
 import base64 from "react-native-base64";
+import localStorage, { LAST_ITEM_KEY } from "../storage/storage";
 
 // UUID
 const SAC_BLE_SERVICES_UUID = {
@@ -23,10 +27,12 @@ const SAC_BLE_SERVICES_UUID = {
 		characteristics: {
 			settingTemperature: "780c3b1e-38a4-47a1-9c2b-9763aa7509c3",
 			settingHumidity: "ca4391b1-a5b1-4b6d-8dcd-055d078fd5fd",
-			control: "7c34e5a7-99b8-4a11-80ea-68f74a7fefc9",
+			control: "42b18506-e2d6-4630-b8b5-7f47ff213058",
 		},
 	},
 };
+
+type fanSpeed = 150 | 200 | 250;
 
 export interface BluetoothLowEnergyApi {
 	allDevices: Device[];
@@ -42,9 +48,11 @@ export interface BluetoothLowEnergyApi {
 	battery: number;
 	settingHumi: number[];
 	settingTemp: number[];
+	control: number;
 	setNewSettingHumi: (value: number[]) => void;
 	setNewSettingTemp: (value: number[]) => void;
-	setControl: (newValue: boolean) => void;
+	setNewControl: (newValue: fanSpeed) => void;
+	setNewPower: (newValue: boolean) => void;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -61,7 +69,8 @@ function useBLE(): BluetoothLowEnergyApi {
 	const [humidity, setHumidity] = useState<number>(50);
 	const [battery, setBattery] = useState<number>(100);
 	const [settingTemp, setSettingTemp] = useState<number[]>([0, 100]);
-	const [settingHumi, setsettingHumi] = useState<number[]>([0, 100]);
+	const [settingHumi, setSettingHumi] = useState<number[]>([0, 100]);
+	const [control, setControl] = useState<fanSpeed>(200);
 
 	const requestAndroid31Permissions = async () => {
 		const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -125,21 +134,23 @@ function useBLE(): BluetoothLowEnergyApi {
 		const deviceConnection = await bleManager.connectToDevice(device.id);
 		if (deviceConnection) {
 			// Check is sac device
-			const deviceServices = await deviceConnection.services();
 			const hasInfoService =
-				deviceServices.findIndex(
-					(service) => service.uuid == SAC_BLE_SERVICES_UUID.infoService.uuid
-				) != -1;
+				await deviceConnection.discoverAllServicesAndCharacteristics();
+
+			const deviceServices = await deviceConnection.services();
+			deviceServices.findIndex(
+				(service) => service.uuid == SAC_BLE_SERVICES_UUID.infoService.uuid
+			) != -1;
 			const hasSettingService =
 				deviceServices.findIndex(
 					(service) => service.uuid == SAC_BLE_SERVICES_UUID.settingService.uuid
 				) != -1;
 			if (!hasInfoService || !hasSettingService) return false;
 
+			console.log("SERVICES" + deviceServices.map((item) => item.uuid + "\n"));
 			setConnectedDevice(deviceConnection);
 			lastDevice.current = deviceConnection;
 
-			await deviceConnection.discoverAllServicesAndCharacteristics();
 			bleManager.stopDeviceScan();
 
 			// Save device to local storage
@@ -154,7 +165,7 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	const disconnectFromCurrentDevice = async () => {
 		if (connectedDevice) {
-			await bleManager.cancelDeviceConnection(connectedDevice?.id);
+			await connectedDevice.cancelConnection();
 			setConnectedDevice(null);
 		}
 	};
@@ -163,86 +174,136 @@ function useBLE(): BluetoothLowEnergyApi {
 		return connectedDevice !== null;
 	};
 
-	// *** Service & characteristic using ***
-	const updatePower = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.infoService.uuid,
-					SAC_BLE_SERVICES_UUID.infoService.characteristics.power
-				);
-			const value = Boolean(base64.decode(characteristic?.value || ""));
-			setPower(value);
+	const onTempUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			console.log("No Data was recieved");
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+
+		setTemperature(Number(rawData));
 	};
 
-	const updateTemperature = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.infoService.uuid,
-					SAC_BLE_SERVICES_UUID.infoService.characteristics.temperature
-				);
-			const value = Number(base64.decode(characteristic?.value || ""));
-			setTemperature(value);
+	const onBatteryUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			console.log("No Data was recieved");
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+
+		setBattery(Number(rawData));
 	};
 
-	const updateHumidity = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.infoService.uuid,
-					SAC_BLE_SERVICES_UUID.infoService.characteristics.humidity
-				);
-			const value = Number(base64.decode(characteristic?.value || ""));
-			setHumidity(value);
+	const onHumidityUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			console.log("No Data was recieved");
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+
+		setHumidity(Number(rawData));
 	};
 
-	const updateBattery = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.infoService.uuid,
-					SAC_BLE_SERVICES_UUID.infoService.characteristics.battery
-				);
-			const value = Number(base64.decode(characteristic?.value || ""));
-			setBattery(value);
+	const onPowerUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			console.log("No Data was recieved");
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+
+		setPower(Boolean(rawData));
 	};
 
-	const updateSettingTemp = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.settingService.uuid,
-					SAC_BLE_SERVICES_UUID.settingService.characteristics
-						.settingTemperature
-				);
-			const value: any = Number(base64.decode(characteristic?.value || ""));
-			setSettingTemp(value);
+	const onSettingTempUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+		const value = rawData.split(" ").map((str_value) => Number(str_value));
+
+		setSettingTemp([value[0], value[1]]);
 	};
 
-	const updateSettingHumi = async () => {
-		if (isConnected()) {
-			const characteristic =
-				await connectedDevice?.readCharacteristicForService(
-					SAC_BLE_SERVICES_UUID.settingService.uuid,
-					SAC_BLE_SERVICES_UUID.settingService.characteristics.settingHumidity
-				);
-			const value: any = base64.decode(characteristic?.value || "");
-			setsettingHumi(value);
+	const onSettingHumidityUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			console.log("No Data was recieved");
+			return -1;
 		}
+
+		const rawData = base64.decode(characteristic.value);
+		const value = rawData.split(" ").map((str_value) => Number(str_value));
+
+		setSettingHumi([value[0], value[1]]);
+	};
+
+	const onControlUpdate = (
+		error: BleError | null,
+		characteristic: Characteristic | null
+	) => {
+		if (error) {
+			console.log(error);
+			return -1;
+		} else if (!characteristic?.value) {
+			return -1;
+		}
+
+		const rawData = Number(base64.decode(characteristic.value));
+		let fanSpeed: fanSpeed;
+		if (rawData < 150) fanSpeed = 150;
+		else if (rawData < 250) fanSpeed = 200;
+		else fanSpeed = 250;
+
+		setControl(fanSpeed);
 	};
 
 	const setNewSettingTemp: (newValue: number[]) => void = async (newValue) => {
+		const stringValue = newValue.join(" ");
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
 				SAC_BLE_SERVICES_UUID.settingService.uuid,
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingTemperature,
-				base64.encode(JSON.stringify(newValue))
+				base64.encode(JSON.stringify(stringValue))
 			);
 			setSettingTemp(newValue);
 		}
@@ -250,23 +311,37 @@ function useBLE(): BluetoothLowEnergyApi {
 	};
 
 	const setNewSettingHumi: (newValue: number[]) => void = async (newValue) => {
+		const stringValue = newValue.join(" ");
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
 				SAC_BLE_SERVICES_UUID.settingService.uuid,
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingHumidity,
-				base64.encode(JSON.stringify(newValue))
+				base64.encode(JSON.stringify(stringValue))
 			);
-			setsettingHumi(newValue);
+			setSettingHumi(newValue);
 		}
 		return;
 	};
 
-	const setControl: (newValue: boolean) => void = async (newValue) => {
+	const setNewControl: (newValue: fanSpeed) => void = async (newValue) => {
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
 				SAC_BLE_SERVICES_UUID.settingService.uuid,
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.control,
 				base64.encode(JSON.stringify(newValue))
+			);
+			setControl(newValue);
+		}
+		return;
+	};
+
+	const setNewPower: (newValue: boolean) => void = async (newValue) => {
+		const intValue: number = newValue ? 1 : 0;
+		if (isConnected()) {
+			await connectedDevice?.writeCharacteristicWithoutResponseForService(
+				SAC_BLE_SERVICES_UUID.infoService.uuid,
+				SAC_BLE_SERVICES_UUID.infoService.characteristics.power,
+				base64.encode(JSON.stringify(intValue))
 			);
 
 			setPower(newValue);
@@ -274,15 +349,64 @@ function useBLE(): BluetoothLowEnergyApi {
 		return;
 	};
 
-	// initial
+	const startStreamingData = async (device: Device) => {
+		if (device) {
+			// ** Info
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.infoService.uuid,
+				SAC_BLE_SERVICES_UUID.infoService.characteristics.temperature,
+				onTempUpdate
+			);
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.infoService.uuid,
+				SAC_BLE_SERVICES_UUID.infoService.characteristics.humidity,
+				onHumidityUpdate
+			);
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.infoService.uuid,
+				SAC_BLE_SERVICES_UUID.infoService.characteristics.battery,
+				onBatteryUpdate
+			);
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.infoService.uuid,
+				SAC_BLE_SERVICES_UUID.infoService.characteristics.power,
+				onPowerUpdate
+			);
+
+			// ** Setting
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.settingService.uuid,
+				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingHumidity,
+				onSettingHumidityUpdate
+			);
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.settingService.uuid,
+				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingTemperature,
+				onSettingTempUpdate
+			);
+			device.monitorCharacteristicForService(
+				SAC_BLE_SERVICES_UUID.settingService.uuid,
+				SAC_BLE_SERVICES_UUID.settingService.characteristics.control,
+				onControlUpdate
+			);
+		} else {
+			console.log("No Device Connected");
+		}
+	};
+
+	// Listen notify
+	useEffect(() => {
+		if (connectedDevice) startStreamingData(connectedDevice);
+	}, [connectedDevice]);
+
+	// Initial
 	useEffect(() => {
 		const request = async () => {
 			await requestPermissions();
 		};
-
 		request();
 
-		// handle state change
+		// listen on disconnect and handle state change
 		bleManager.onDeviceDisconnected(connectedDevice?.id || "", () => {
 			setConnectedDevice(null);
 		});
@@ -303,34 +427,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		if (!connectedDevice) tryGetLastDevice();
 	}, []);
 
-	// Get first data & Set auto fetch characterictis data
-	useEffect(() => {
-		if (!connectedDevice) return;
-
-		// Get data
-		updateSettingHumi();
-		updateSettingTemp();
-
-		// Mỗi giây check 1 lần
-		const time = 1000;
-		const iv = setInterval(() => {
-			updateHumidity();
-			updateTemperature();
-			updatePower();
-		}, time);
-
-		// Mỗi phút check 1 lần
-		const timeBattery = 1000 * 60;
-		const ivBattery = setInterval(() => {
-			updateBattery();
-		}, timeBattery);
-
-		return () => {
-			clearInterval(iv);
-			clearInterval(ivBattery);
-		};
-	}, [connectedDevice]);
-
 	return {
 		scanForPeripherals,
 		requestPermissions,
@@ -340,6 +436,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		connectedDevice,
 		lastDevice: lastDevice?.current,
 		power,
+		control,
 		temperature,
 		humidity,
 		battery,
@@ -347,7 +444,8 @@ function useBLE(): BluetoothLowEnergyApi {
 		settingTemp,
 		setNewSettingHumi,
 		setNewSettingTemp,
-		setControl,
+		setNewPower,
+		setNewControl,
 	};
 }
 

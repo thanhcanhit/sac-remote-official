@@ -42,9 +42,9 @@ const Home = () => {
 	return (
 		<View flex marginT-16>
 			<View marginB-24>
-				<Text text40>Xin chào, {userName}</Text>
+				<Text text50>Welcome back, {userName}</Text>
 				<Text text70T color={COLORS.SECONDARY}>
-					SAC chúc bạn một ngày mới tốt lành ❤️
+					SAC Hope your journey is no longer hot ❤️
 				</Text>
 			</View>
 			<TouchableOpacity
@@ -60,7 +60,7 @@ const Home = () => {
 					<View width={1} marginV-16 backgroundColor={COLORS.WHITE}></View>
 					<View flex-2 center>
 						<Text text60T color={COLORS.WHITE}>
-							Bảng điều khiển
+							Remote Panel
 						</Text>
 						<Text text40B color={COLORS.WHITE}>
 							SAC Device
@@ -71,7 +71,7 @@ const Home = () => {
 			<ProductCarousel />
 			<View>
 				<Text text80 color={COLORS.SECONDARY}>
-					Các tính năng khác đang phát triển...
+				More features in development...
 				</Text>
 			</View>
 		</View>

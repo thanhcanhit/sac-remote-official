@@ -51,7 +51,7 @@ const DeviceItem = ({
 				</View>
 				<View flex-5>
 					<Text text70L color={isConnected ? COLORS.WHITE : COLORS.TEXT_BLACK}>
-						{device.name || "Thiết bị không tên"}
+						{device.name || "Unnamed device"}
 					</Text>
 					<Text color={isConnected ? COLORS.WHITE : COLORS.SECONDARY}>
 						{device.id}

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useRef, useState } from "react";
+import React, { Fragment, useContext, useMemo, useRef, useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import {
 	ActionSheet,
@@ -19,12 +19,27 @@ type SettingState = {
 };
 
 const Setting = () => {
-	const { setNewSettingHumi, setNewSettingTemp, settingHumi, settingTemp } =
-		useContext(BluetoothContext).useBLE;
+	const {
+		setNewSettingHumi,
+		setNewSettingTemp,
+		settingHumi,
+		settingTemp,
+		control,
+		setNewControl,
+	} = useContext(BluetoothContext).useBLE;
+
 	const [currentSetting, setCurrentSetting] = useState<InfoCharacterisctic>();
-	const [slider, setSlider] = useState<SettingState>({ min: 0, max: 100 });
+	const [rangeSlider, setRangeSlider] = useState<SettingState>({
+		min: 0,
+		max: 100,
+	});
+	const [speedSlider, setSpeedSlider] = useState<number>(() => {
+		if (control) return (control - 100) / 50;
+		return 1;
+	});
+
+	const [isOpen, setOpen] = useState<boolean>(false);
 	const timer = useRef<NodeJS.Timeout>();
-	const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
 	const tempSetting: SettingState = {
 		min: settingTemp[0] | 0,
@@ -36,19 +51,25 @@ const Setting = () => {
 	};
 
 	const toggleActionSheet = () => {
-		setIsModalOpen(!isModalOpen);
+		setOpen(!isOpen);
 	};
 
 	const onTempButtonClick = () => {
 		toggleActionSheet();
 		setCurrentSetting("temperature");
-		setSlider(tempSetting);
+		setRangeSlider(tempSetting);
 	};
 
 	const onHumidityButtonClick = () => {
 		toggleActionSheet();
 		setCurrentSetting("humidity");
-		setSlider(humiditySetting);
+		setRangeSlider(humiditySetting);
+	};
+
+	const onFanSpeedButtonClick = () => {
+		toggleActionSheet();
+		setCurrentSetting("fanSpeed");
+		setSpeedSlider((control - 100) / 50);
 	};
 
 	const settings: {
@@ -57,15 +78,38 @@ const Setting = () => {
 		onPress: (props: any) => void;
 	}[] = [
 		{
+			name: "Set fan speed",
+			content: (
+				<View flex row>
+					<View gap-8 flex-4>
+						<Text text80 color={COLORS.SECONDARY}>
+							Change level
+						</Text>
+						<Text text60 color={COLORS.PRIMARY}>
+							Fan speed
+						</Text>
+					</View>
+					<View flex-1 center>
+						<MaterialCommunityIcon
+							name="fan"
+							size={30}
+							color={COLORS.PRIMARY}
+						/>
+					</View>
+				</View>
+			),
+			onPress: onFanSpeedButtonClick,
+		},
+		{
 			name: "Auto by temperature",
 			content: (
 				<View flex row>
 					<View gap-8 flex-4>
 						<Text text80 color={COLORS.SECONDARY}>
-							Thiết lập tự động bật/tắt thiết bị theo
+							Automatically turn on/off according to
 						</Text>
 						<Text text60 color={COLORS.PRIMARY}>
-							Nhiệt độ
+							Temperature
 						</Text>
 					</View>
 					<View flex-1 center>
@@ -85,10 +129,10 @@ const Setting = () => {
 				<View flex row>
 					<View gap-8 flex-4>
 						<Text text80 color={COLORS.SECONDARY}>
-							Thiết lập tự động bật/tắt thiết bị theo
+							Automatically turn on/off according to
 						</Text>
 						<Text text60 color={COLORS.PRIMARY}>
-							Độ ẩm
+							Humidity
 						</Text>
 					</View>
 					<View flex-1 center>
@@ -105,6 +149,21 @@ const Setting = () => {
 	];
 
 	const onDismiss = () => {
+		if (currentSetting == "fanSpeed") {
+			setSpeedSlider(control);
+		}
+		toggleActionSheet();
+	};
+
+	const onSubmit = () => {
+		if (currentSetting == "temperature") {
+			setNewSettingTemp([rangeSlider.min, rangeSlider.max]);
+		} else if (currentSetting == "humidity") {
+			setNewSettingHumi([rangeSlider.min, rangeSlider.max]);
+		} else if (currentSetting == "fanSpeed") {
+			const speedValue = speedSlider == 1 ? 150 : speedSlider == 2 ? 200 : 250;
+			setNewControl(speedValue);
+		}
 		toggleActionSheet();
 	};
 
@@ -113,21 +172,92 @@ const Setting = () => {
 		timer.current = setTimeout(() => {
 			const min = Math.round(values.min);
 			const max = Math.round(values.max);
-			setSlider({ min, max });
+			setRangeSlider({ min, max });
 		}, 200);
 	};
 
-	const onSubmit = () => {
-		if (currentSetting == "temperature") {
-			setNewSettingTemp([slider.min, slider.max]);
-		} else if (currentSetting == "humidity") {
-			setNewSettingHumi([slider.min, slider.max]);
+	const settingName = useMemo(() => {
+		switch (currentSetting) {
+			case "humidity":
+				return "Humidity (%)";
+			case "temperature":
+				return "Temperature (°C)";
+			case "fanSpeed":
+				return "Fan speed";
 		}
-		toggleActionSheet();
-	};
+	}, [currentSetting]);
 
-	const settingName =
-		currentSetting == "temperature" ? "Nhiệt độ (°C)" : "Độ ẩm (%)";
+	const actionSheetContent: React.ReactElement = useMemo(() => {
+		switch (currentSetting) {
+			case "humidity":
+			case "temperature":
+				return (
+					<>
+						<View paddingH-16>
+							<Slider
+								useRange
+								useGap={false}
+								minimumValue={0}
+								maximumValue={100}
+								initialMinimumValue={rangeSlider.min}
+								initialMaximumValue={rangeSlider.max}
+								onRangeChange={onSliderRangeChange}
+								thumbTintColor={COLORS.PRIMARY}
+								minimumTrackTintColor={COLORS.PRIMARY}
+							/>
+						</View>
+						<View>
+							<Text text60 color={COLORS.PRIMARY}>
+								{settingName}
+							</Text>
+							<Text>
+								The device will turn off when under:{" "}
+								<Text text60 color={COLORS.PRIMARY}>
+									{rangeSlider.min}
+								</Text>
+							</Text>
+							<Text>
+								The device will turn on when on:{" "}
+								<Text text60 color={COLORS.PRIMARY}>
+									{rangeSlider.max}
+								</Text>
+							</Text>
+						</View>
+					</>
+				);
+			case "fanSpeed":
+				return (
+					<>
+						<View paddingH-16>
+							<Slider
+								value={speedSlider}
+								minimumValue={1}
+								maximumValue={3}
+								step={1}
+								onValueChange={(value) => {
+									setSpeedSlider(value);
+								}}
+								thumbTintColor={COLORS.PRIMARY}
+								minimumTrackTintColor={COLORS.PRIMARY}
+							/>
+						</View>
+						<View>
+							<Text text60 color={COLORS.PRIMARY}>
+								{settingName}
+							</Text>
+							<Text>
+								Current level:{" "}
+								<Text text60 color={COLORS.PRIMARY}>
+									{speedSlider}
+								</Text>
+							</Text>
+						</View>
+					</>
+				);
+			default:
+				return <></>;
+		}
+	}, [currentSetting, speedSlider, rangeSlider]);
 
 	return (
 		<Fragment>
@@ -150,50 +280,21 @@ const Setting = () => {
 
 			{/* Action sheet for detail setting */}
 			<ActionSheet
-				visible={isModalOpen}
-				title={"Hãy thiết lập giới hạn tắt/mở"}
+				visible={isOpen}
+				title={"Make your choice"}
 				message={"Message goes here"}
 				cancelButtonIndex={3}
 				destructiveButtonIndex={0}
 				renderAction={(options, index) => (
 					<View paddingH-8 gap-8 key={index}>
-						<View paddingH-16>
-							<Slider
-								useRange
-								useGap={false}
-								minimumValue={0}
-								maximumValue={100}
-								initialMinimumValue={slider.min}
-								initialMaximumValue={slider.max}
-								onRangeChange={onSliderRangeChange}
-								thumbTintColor={COLORS.PRIMARY}
-								minimumTrackTintColor={COLORS.PRIMARY}
-							/>
-						</View>
-						<View>
-							<Text text60 color={COLORS.PRIMARY}>
-								{settingName}
-							</Text>
-							<Text>
-								Thiết bị sẽ tắt khi dưới:{" "}
-								<Text text60 color={COLORS.PRIMARY}>
-									{slider.min}
-								</Text>
-							</Text>
-							<Text>
-								Thiết bị sẽ bật khi trên:{" "}
-								<Text text60 color={COLORS.PRIMARY}>
-									{slider.max}
-								</Text>
-							</Text>
-						</View>
+						{actionSheetContent}
 						<Button
-							label="Xác nhận"
+							label="Confirm"
 							backgroundColor={COLORS.PRIMARY}
 							onPress={onSubmit}
 						/>
 						<Button
-							label="Hủy bỏ"
+							label="Cancel"
 							backgroundColor={COLORS.GRAY}
 							onPress={onDismiss}
 						/>

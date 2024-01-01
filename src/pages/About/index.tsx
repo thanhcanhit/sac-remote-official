@@ -25,61 +25,59 @@ type MemberInformation = {
 	interest: string;
 	reasons: string;
 };
-
 const informations: MemberInformation[] = [
 	{
 		name: "Trần Thị Minh Thư",
-		major: "Ngôn ngữ Anh",
+		major: "English Language",
 		interest:
-			"các sản phẩm công nghệ thông minh phục vụ cộng đồng và có tiềm năng phục vụ thị trường",
+			"Smart technology products serving the community and having the potential to serve the market",
 		reasons:
-			"muốn thử sức với một cuộc thi lớn và góp phần tạo ra sản phẩm giá trị cho xã hội",
+			"Want to challenge oneself with a major competition and contribute to creating valuable products for society",
 	},
 	{
 		name: "Lê Chí Thiện",
-		major: "IOT và trí tuệ nhân tạo ứng dụng",
+		major: "IoT and Applied Artificial Intelligence",
 		interest:
-			"các sản phẩm công nghệ thông minh phục vụ cộng đồng và có tiềm năng phục vụ thị trường",
+			"Smart technology products serving the community and having the potential to serve the market",
 		reasons:
-			"muốn xây dựng sản phẩm phục vụ lợi ích cộng đồng tạo ra giá trị cho xã hội",
+			"Want to build products for the community's benefit, creating value for society",
 	},
 	{
 		name: "Trần Xuân Đoan",
-		major: "Kinh doanh quốc tế",
+		major: "International Business",
 		interest:
-			"các sản phẩm công nghệ thông minh với mong muốn phục vụ cộng đồng và phát triển xã hội",
+			"Smart technology products with the desire to serve the community and contribute to societal development",
 		reasons:
-			"muốn học hỏi những kiến thức thực tế, muốn nghiên cứu về lĩnh vực kinh doanh để phát triển doanh nghiệp trong tương lai",
+			"Want to learn practical knowledge, research business fields to develop future enterprises",
 	},
 	{
 		name: "Nguyễn Thanh Cảnh",
-		major: "Kỹ Thuật Phần Mềm",
-		interest: "xây dựng các sản phẩm phần mềm, website phục vụ cộng đồng",
+		major: "Software Engineering",
+		interest: "Building software products, websites serving the community",
 		reasons:
-			"giúp các bạn hiện thực ý tưởng trở thành sản phẩm đồng thời học hỏi nâng cao trình độ bản thân",
+			"Help friends turn their ideas into products while learning and improving personal skills",
 	},
 	{
 		name: "Nguyễn Minh Huyền",
-		major: "Thương mại điện tử",
+		major: "E-commerce",
 		interest:
-			"các sản phẩm, thiết bị thông minh giải quyết các nhu cầu trong đời sống con người và duy trì thiên nhiên bền vững",
+			"Smart products, devices addressing human life needs and maintaining sustainable nature",
 		reasons:
-			"muốn học hỏi và rèn luyện kiến thức thực tế về phát triển sản phẩm trong kinh doanh, có sản phẩm giúp bảo vệ sức khỏe người dân trong khi làm việc dưới trời nắng",
+			"Want to learn and practice practical knowledge about product development in business, create products that protect people's health while working outdoors",
 	},
 	{
 		name: "Lê Thị Bình Nguyên",
 		major: "Marketing",
-		interest: "các sản phẩm phục vụ đời sống và sức khoẻ của con người",
+		interest: "Products serving human life and health",
 		reasons:
-			"muốn học hỏi kinh nghiệm nghiên cứu và sáng tạo sản phẩm phục vụ cộng đồng, được cọ sát bản thân với thực tế để tích lũy kinh nghiệm cho bản thân",
+			"Want to learn research and innovation experience to create community-serving products, gain hands-on experience to accumulate personal knowledge and experience",
 	},
 	{
 		name: "Lê Thị Thu Thảo",
-		major: "Thương mại điện tử",
-		interest:
-			"sản phẩm công nghệ phục vụ các nhu cầu đời sống và sức khỏe con người",
+		major: "E-commerce",
+		interest: "Technology products serving human life and health",
 		reasons:
-			"muốn trải nghiệm qua những dự án để được cọ sát với thực tế và tích lũy thêm nhiều kiến thức và kinh nghiệm cho bản thân sau này",
+			"Want to experience projects to closely engage with reality and accumulate more knowledge and experience for the future",
 	},
 ];
 
@@ -114,6 +112,10 @@ const About = () => {
 		inputRange: [0, 100],
 		outputRange: [0, -windowWidth],
 	});
+
+	function capitalize(input: string): string {
+		return input.charAt(0).toUpperCase() + input.slice(1).toLocaleLowerCase();
+	}
 
 	return (
 		<View flex>
@@ -180,13 +182,14 @@ const About = () => {
 
 				<View paddingH-24 gap-8>
 					<Text text80 color={COLORS.SECONDARY}>
-						Chuyên ngành: <Text>{currentMember.major}</Text>
+						Specialized: <Text>{capitalize(currentMember.major)}</Text>
 					</Text>
 					<Text text80 color={COLORS.SECONDARY}>
-						Lĩnh vực quan tâm: <Text>{currentMember.interest.normalize()}</Text>
+						Areas of concern: <Text>{capitalize(currentMember.interest)}</Text>
 					</Text>
 					<Text text80 color={COLORS.SECONDARY}>
-						Lý do tham gia: <Text>{currentMember.reasons.normalize()}</Text>
+						Reasons to participate:{" "}
+						<Text>{capitalize(currentMember.reasons)}</Text>
 					</Text>
 				</View>
 			</View>

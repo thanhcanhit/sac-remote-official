@@ -54,10 +54,12 @@ const ServiceButton = ({
 					height: "100%",
 				}}
 			>
-				<View gap-8>
-					{Icon}
+				<View flex gap-8 left>
+					<View flex-1>{Icon}</View>
 
-					<Text color={COLORS.WHITE}>{name}</Text>
+					<View flex-1 center>
+						<Text color={COLORS.WHITE}>{name}</Text>
+					</View>
 				</View>
 			</LinearGradient>
 		</TouchableOpacity>

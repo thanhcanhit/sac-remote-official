@@ -72,7 +72,7 @@ const Device = () => {
 	useEffect(() => {
 		const initial = async () => {
 			let isTurnOn: Boolean = (await getBluetoothState()) == "PoweredOn";
-			while (!isTurnOn) {
+			if (!isTurnOn) {
 				try {
 					isTurnOn = await requestToEnable();
 				} catch {}
@@ -93,7 +93,7 @@ const Device = () => {
 				<View flex-1>
 					<View>
 						<Text text60 marginB-8>
-							Thiết bị đã kết nối trước đó
+							Most recently connected device
 						</Text>
 						{connectedDevice ? (
 							<DeviceItem
@@ -115,18 +115,21 @@ const Device = () => {
 
 			<View flex-5>
 				<Text text60>
-					Các thiết bị xung quanh bạn: (
-					{showNoNameDevice
-						? allDevices.length
-						: allDevices.filter((item) => item.name).length}
-					)
+					Devices around you:{" "}
+					<Text text80>
+						(
+						{showNoNameDevice
+							? allDevices.length
+							: allDevices.filter((item) => item.name).length}
+						)
+					</Text>
 				</Text>
 				<View
 					row
 					marginB-8
 					style={{ justifyContent: "space-between", alignItems: "center" }}
 				>
-					<Text text70>Hiển thị các thiết bị không tên: </Text>
+					<Text text70>Show unnamed devices: </Text>
 					<Switch
 						thumbColor={COLORS.PRIMARY}
 						trackColor={{ true: COLORS.LIGHT_PRIMARY }}
@@ -141,7 +144,7 @@ const Device = () => {
 					marginB-8
 					br20
 					onPress={handleRefreshScan}
-					label="Làm mới"
+					label="Refresh"
 					backgroundColor={COLORS.PRIMARY}
 				/>
 
@@ -164,10 +167,10 @@ const Device = () => {
 								<Text
 									text90T
 									color={COLORS.SECONDARY}
-									style={{ maxWidth: 200, textAlign: "center" }}
+									style={{ maxWidth: 250, textAlign: "center" }}
 								>
-									Hãy thử quét thiết bị lại nếu đợi quá lâu mà không có phản hồi
-									bạn nhé
+									Please try scanning the device again if you wait too long
+									without a response
 								</Text>
 							</View>
 						)}
@@ -176,7 +179,7 @@ const Device = () => {
 			</View>
 
 			<ActionSheet
-				title={"Chọn thao tác"}
+				title={"Select operation"}
 				cancelButtonIndex={2}
 				destructiveButtonIndex={0}
 				onDismiss={() => {
@@ -190,32 +193,32 @@ const Device = () => {
 							br50
 							backgroundColor={COLORS.LIGHT_PRIMARY}
 						>
-							<Text text60 color={COLORS.WHITE}>
-								Thông tin thiết bị
+							<Text text60 color={COLORS.WHITE} center>
+								Device Information
 							</Text>
-							<View paddingL-8>
+							<View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>Name:</Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.name || "NO"}
+										{selectedDevice.current?.name || "- - -"}
 									</Text>
 								</View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>Local name: </Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.localName || "NO"}
+										{selectedDevice.current?.localName || "- - -"}
 									</Text>
 								</View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>Id:</Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.id || "NO"}
+										{selectedDevice.current?.id || "- - -"}
 									</Text>
 								</View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>Maximum Transmission Unit: </Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.mtu || "NO"}
+										{selectedDevice.current?.mtu || "- - -"}
 									</Text>
 								</View>
 								<View row style={styles.infoLine}>
@@ -223,13 +226,13 @@ const Device = () => {
 										Rec eived Signal Strength Indication:{" "}
 									</Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.rssi || "NO"}
+										{selectedDevice.current?.rssi || "- - -"}
 									</Text>
 								</View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>Transmission power: </Text>
 									<Text color={COLORS.WHITE}>
-										{selectedDevice.current?.txPowerLevel || "NO"}
+										{selectedDevice.current?.txPowerLevel || "- - -"}
 									</Text>
 								</View>
 							</View>

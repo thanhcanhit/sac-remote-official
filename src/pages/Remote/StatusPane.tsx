@@ -12,17 +12,17 @@ const serviceList: {
 }[] = [
 	{
 		id: "temperature",
-		label: "Nhiệt độ",
+		label: "Thermal",
 		icon: <MaterialCommunityIcon name="temperature-celsius" size={30} />,
 	},
 	{
 		id: "humidity",
-		label: "Độ ẩm",
+		label: "Humidity",
 		icon: <MaterialCommunityIcon name="water-outline" size={30} />,
 	},
 	{
 		id: "battery",
-		label: "Lượng pin",
+		label: "Battery",
 		icon: <MaterialCommunityIcon name="battery-outline" size={30} />,
 	},
 ];

@@ -77,7 +77,7 @@ export default function App() {
 						name="Home"
 						component={HomePage}
 						options={{
-							title: "Trang chủ",
+							title: "Home Page",
 							drawerIcon: ({ color, size }) => (
 								<FeatherIcon size={size} color={color} name="home" />
 							),
@@ -88,7 +88,7 @@ export default function App() {
 						name="Remote"
 						component={RemotePage}
 						options={{
-							title: "Bảng điểu khiển",
+							title: "Remote Panel",
 							drawerIcon: ({ color, size }) => (
 								<MaterialCommunityIcon
 									size={size}
@@ -103,7 +103,7 @@ export default function App() {
 						name="Device"
 						component={DevicePage}
 						options={{
-							title: "Quản lí thiết bị",
+							title: "Device Management",
 							drawerIcon: ({ color, size }) => (
 								<FeatherIcon size={size} color={color} name="bluetooth" />
 							),
@@ -114,7 +114,7 @@ export default function App() {
 						name="About"
 						component={AboutPage}
 						options={{
-							title: "Về chúng tôi",
+							title: "About us",
 							drawerIcon: ({ color, size }) => (
 								<MaterialCommunityIcon
 									size={size}

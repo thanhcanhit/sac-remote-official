@@ -6,16 +6,26 @@ import StatusPane from "./StatusPane";
 import Setting from "./Setting";
 import { COLORS } from "../../utils/color";
 
-export type InfoCharacterisctic = "temperature" | "humidity" | "battery";
+export type InfoCharacterisctic =
+	| "temperature"
+	| "humidity"
+	| "battery"
+	| "fanSpeed";
 const Remote = () => {
-	const { battery, humidity, power, temperature, setControl, connectedDevice } =
-		useContext(BluetoothContext).useBLE;
+	const {
+		battery,
+		humidity,
+		power,
+		temperature,
+		setNewPower,
+		connectedDevice,
+	} = useContext(BluetoothContext).useBLE;
 	const [currentActive, setCurrentActive] =
 		useState<InfoCharacterisctic>("temperature");
 	const [showToast, setShowToast] = useState<boolean>(false);
 
 	const togglePower = () => {
-		setControl(!power);
+		setNewPower(!power);
 	};
 
 	useEffect(() => {
@@ -35,9 +45,11 @@ const Remote = () => {
 			<View flex-3>
 				<View row centerV>
 					<View flex-3 left>
-						<Text text50>Trạng thái</Text>
+						<Text text50>Status</Text>
 						{!connectedDevice && (
-							<Text text70 color={COLORS.SECONDARY}>(Hiện chưa có kết nối với thiết bị)</Text>
+							<Text text90 center color={COLORS.RED}>
+								(There is currently no connection to any device)
+							</Text>
 						)}
 					</View>
 					<View flex-1 right>
@@ -57,14 +69,14 @@ const Remote = () => {
 			<View flex-2 marginT-32>
 				<View flex-3 left>
 					<Text text50 marginB-8>
-						Thiết lập
+						Setting
 					</Text>
 					<Setting />
 				</View>
 			</View>
 
 			<Incubator.Toast
-				message={"Hiện chưa có kết nối với thiết bị SAC nào"}
+				message={"There are currently no connections to any SAC devices"}
 				visible={showToast}
 				preset={"offline"}
 				centerMessage

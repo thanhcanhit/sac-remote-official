@@ -13,8 +13,8 @@ const ProductCarousel = () => {
 	return (
 		<View marginV-8>
 			<Text text70 marginB-8>
-				Một số hình ảnh về sản phẩm:{" "}
-				<Text color={COLORS.PRIMARY}>Đai điều hòa</Text>
+				Some images of the product:{" "}
+				<Text color={COLORS.PRIMARY}>Air conditioner belt</Text>
 			</Text>
 			<Carousel
 				autoplay
