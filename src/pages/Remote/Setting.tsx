@@ -12,11 +12,7 @@ import { BluetoothContext } from "../../contexts/BluetoothContextProvider";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS } from "../../utils/color";
 import { InfoCharacterisctic } from ".";
-
-type SettingState = {
-	min: number;
-	max: number;
-};
+import { SettingState } from "../../bluetooth/useBLE";
 
 const Setting = () => {
 	const {
@@ -41,14 +37,8 @@ const Setting = () => {
 	const [isOpen, setOpen] = useState<boolean>(false);
 	const timer = useRef<NodeJS.Timeout>();
 
-	const tempSetting: SettingState = {
-		min: settingTemp[0] | 0,
-		max: settingTemp[0] | 100,
-	};
-	const humiditySetting: SettingState = {
-		min: settingHumi[0] | 0,
-		max: settingHumi[0] | 100,
-	};
+	const tempSetting: SettingState = settingTemp;
+	const humiditySetting: SettingState = settingHumi;
 
 	const toggleActionSheet = () => {
 		setOpen(!isOpen);
@@ -157,9 +147,9 @@ const Setting = () => {
 
 	const onSubmit = () => {
 		if (currentSetting == "temperature") {
-			setNewSettingTemp([rangeSlider.min, rangeSlider.max]);
+			setNewSettingTemp({ min: rangeSlider.min, max: rangeSlider.max });
 		} else if (currentSetting == "humidity") {
-			setNewSettingHumi([rangeSlider.min, rangeSlider.max]);
+			setNewSettingHumi({ min: rangeSlider.min, max: rangeSlider.max });
 		} else if (currentSetting == "fanSpeed") {
 			const speedValue = speedSlider == 1 ? 150 : speedSlider == 2 ? 200 : 250;
 			setNewControl(speedValue);

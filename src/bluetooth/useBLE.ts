@@ -32,7 +32,12 @@ const SAC_BLE_SERVICES_UUID = {
 	},
 };
 
-type fanSpeed = 150 | 200 | 250;
+export type fanSpeed = 150 | 200 | 250;
+
+export type SettingState = {
+	min: number;
+	max: number;
+};
 
 export interface BluetoothLowEnergyApi {
 	allDevices: Device[];
@@ -46,11 +51,11 @@ export interface BluetoothLowEnergyApi {
 	temperature: number;
 	humidity: number;
 	battery: number;
-	settingHumi: number[];
-	settingTemp: number[];
+	settingHumi: SettingState;
+	settingTemp: SettingState;
 	control: number;
-	setNewSettingHumi: (value: number[]) => void;
-	setNewSettingTemp: (value: number[]) => void;
+	setNewSettingHumi: (value: SettingState) => void;
+	setNewSettingTemp: (value: SettingState) => void;
 	setNewControl: (newValue: fanSpeed) => void;
 	setNewPower: (newValue: boolean) => void;
 }
@@ -68,8 +73,14 @@ function useBLE(): BluetoothLowEnergyApi {
 	const [temperature, setTemperature] = useState<number>(20);
 	const [humidity, setHumidity] = useState<number>(50);
 	const [battery, setBattery] = useState<number>(100);
-	const [settingTemp, setSettingTemp] = useState<number[]>([0, 100]);
-	const [settingHumi, setSettingHumi] = useState<number[]>([0, 100]);
+	const [settingTemp, setSettingTemp] = useState<SettingState>({
+		min: 22,
+		max: 40,
+	});
+	const [settingHumi, setSettingHumi] = useState<SettingState>({
+		min: 40,
+		max: 80,
+	});
 	const [control, setControl] = useState<fanSpeed>(200);
 
 	const requestAndroid31Permissions = async () => {
@@ -186,7 +197,9 @@ function useBLE(): BluetoothLowEnergyApi {
 			return -1;
 		}
 
+		// console.log("Temp update: " + characteristic.value);
 		const rawData = base64.decode(characteristic.value);
+		console.log("Temp update: " + rawData);
 
 		setTemperature(Number(rawData));
 	};
@@ -204,6 +217,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value);
+		console.log("Battery update: " + rawData);
 
 		setBattery(Number(rawData));
 	};
@@ -221,6 +235,7 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value);
+		console.log("Humidity update: " + rawData);
 
 		setHumidity(Number(rawData));
 	};
@@ -233,13 +248,14 @@ function useBLE(): BluetoothLowEnergyApi {
 			console.log(error);
 			return -1;
 		} else if (!characteristic?.value) {
-			console.log("No Data was recieved");
+			console.log("Power No Data was recieved");
 			return -1;
 		}
 
 		const rawData = base64.decode(characteristic.value);
+		console.log("Power update: " + rawData + " (" + Boolean(rawData));
 
-		setPower(Boolean(rawData));
+		setPower(Boolean(Number(rawData)));
 	};
 
 	const onSettingTempUpdate = (
@@ -253,10 +269,13 @@ function useBLE(): BluetoothLowEnergyApi {
 			return -1;
 		}
 
-		const rawData = base64.decode(characteristic.value);
+		const rawData = base64.decode(characteristic.value).replace(/"/g, "");
+		console.log("Listen setting RAW " + rawData);
 		const value = rawData.split(" ").map((str_value) => Number(str_value));
+		console.log("Listen setting temp " + value);
 
-		setSettingTemp([value[0], value[1]]);
+		console.log("VALUE" + value[0], "VALUE" + value[1]);
+		setSettingTemp({ min: value[0], max: value[1] });
 	};
 
 	const onSettingHumidityUpdate = (
@@ -271,10 +290,11 @@ function useBLE(): BluetoothLowEnergyApi {
 			return -1;
 		}
 
-		const rawData = base64.decode(characteristic.value);
+		const rawData = base64.decode(characteristic.value).replace(/"/g, "");
 		const value = rawData.split(" ").map((str_value) => Number(str_value));
 
-		setSettingHumi([value[0], value[1]]);
+		console.log("VALUE" + value);
+		setSettingHumi({ min: value[0], max: value[1] });
 	};
 
 	const onControlUpdate = (
@@ -289,36 +309,40 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = Number(base64.decode(characteristic.value));
+		console.log("Control update: " + rawData);
 		let fanSpeed: fanSpeed;
 		if (rawData < 150) fanSpeed = 150;
 		else if (rawData < 250) fanSpeed = 200;
 		else fanSpeed = 250;
+		console.log("Control transform update: " + fanSpeed);
 
 		setControl(fanSpeed);
 	};
 
-	const setNewSettingTemp: (newValue: number[]) => void = async (newValue) => {
-		const stringValue = newValue.join(" ");
+	const setNewSettingTemp: (newValue: SettingState) => void = async (
+		newValue
+	) => {
+		const stringValue = newValue.min + " " + newValue.max;
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
 				SAC_BLE_SERVICES_UUID.settingService.uuid,
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingTemperature,
 				base64.encode(JSON.stringify(stringValue))
 			);
-			setSettingTemp(newValue);
 		}
 		return;
 	};
 
-	const setNewSettingHumi: (newValue: number[]) => void = async (newValue) => {
-		const stringValue = newValue.join(" ");
+	const setNewSettingHumi: (newValue: SettingState) => void = async (
+		newValue
+	) => {
+		const stringValue = newValue.min + " " + newValue.max;
 		if (isConnected()) {
 			await connectedDevice?.writeCharacteristicWithoutResponseForService(
 				SAC_BLE_SERVICES_UUID.settingService.uuid,
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.settingHumidity,
 				base64.encode(JSON.stringify(stringValue))
 			);
-			setSettingHumi(newValue);
 		}
 		return;
 	};
@@ -330,7 +354,6 @@ function useBLE(): BluetoothLowEnergyApi {
 				SAC_BLE_SERVICES_UUID.settingService.characteristics.control,
 				base64.encode(JSON.stringify(newValue))
 			);
-			setControl(newValue);
 		}
 		return;
 	};
@@ -343,8 +366,6 @@ function useBLE(): BluetoothLowEnergyApi {
 				SAC_BLE_SERVICES_UUID.infoService.characteristics.power,
 				base64.encode(JSON.stringify(intValue))
 			);
-
-			setPower(newValue);
 		}
 		return;
 	};
@@ -396,7 +417,25 @@ function useBLE(): BluetoothLowEnergyApi {
 
 	// Listen notify
 	useEffect(() => {
-		if (connectedDevice) startStreamingData(connectedDevice);
+		const readPowerState = async () => {
+			const characteristic =
+				await connectedDevice?.readCharacteristicForService(
+					SAC_BLE_SERVICES_UUID.infoService.uuid,
+					SAC_BLE_SERVICES_UUID.infoService.characteristics.power
+				);
+			console.log("FIRST READ " + characteristic?.value);
+			if (characteristic?.value) {
+				console.log("FIRST HAS VALUE " + base64.decode(characteristic.value));
+				const value = Boolean(Number(base64.decode(characteristic.value)));
+
+				setPower(value);
+			}
+		};
+
+		if (connectedDevice) {
+			readPowerState();
+			startStreamingData(connectedDevice);
+		}
 	}, [connectedDevice]);
 
 	// Initial
