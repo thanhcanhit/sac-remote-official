@@ -59,7 +59,6 @@ const StatusPane = ({
 				<View
 					row
 					padding-8
-					marginB-24
 					gap-8
 					style={{ marginLeft: -6, zIndex: 9 }}
 				>

@@ -9,6 +9,7 @@ import { COLORS } from "./../../utils/color";
 import { BOX_SHADOW } from "../../utils/styles";
 import storage, { USER_INFO_KEY } from "../../storage/storage";
 import ProductCarousel from "./ProductCarousel";
+import { ScrollView } from "react-native";
 
 const RemoteIcon = (
 	<MaterialCommunityIcon name="remote" size={40} color={COLORS.WHITE} />
@@ -18,7 +19,7 @@ type homeScreenProp = DrawerNavigationProp<RootDrawerParamList, "Home">;
 
 const Home = () => {
 	const navigation = useNavigation<homeScreenProp>();
-	const [userName, setUserName] = useState<string>("Người dùng");
+	const [userName, setUserName] = useState<string>("Username");
 
 	const moveToRemotePage = () => {
 		navigation.navigate("Remote");
@@ -68,12 +69,14 @@ const Home = () => {
 					</View>
 				</LinearGradientView>
 			</TouchableOpacity>
-			<ProductCarousel />
-			<View>
-				<Text text80 color={COLORS.SECONDARY}>
-				More features in development...
-				</Text>
-			</View>
+			<ScrollView>
+				<ProductCarousel />
+				<View>
+					<Text text80 color={COLORS.SECONDARY}>
+						More features in development...
+					</Text>
+				</View>
+			</ScrollView>
 		</View>
 	);
 };

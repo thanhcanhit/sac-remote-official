@@ -10,7 +10,7 @@ type StatusProgressProps = {
 
 const StatusProgress = ({ state }: StatusProgressProps) => {
 	return (
-		<View center marginT-32>
+		<View center marginT-8 style={{zIndex: -1}}>
 			<AnimatedCircularProgress
 				size={250}
 				width={20}

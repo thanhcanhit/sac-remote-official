@@ -16,21 +16,21 @@ const IntroStatus = ({ onPress, x, y }: StepType) => {
 					<StatSVG width={250} height={400} />
 				</Animated.View>
 				<Text text40 color={COLORS.PRIMARY} center marginB-8>
-					Theo dõi trạng thái
+					Monitor status
 				</Text>
 				<Text text70 color={COLORS.SECONDARY} center>
-					Theo dõi các thông tin:{" "}
+					Monitoring information:{" "}
 					<Text color={COLORS.PRIMARY}>
-						nhiệt độ, độ ẩm, lượng pin, nguồn thiết bị
+						temperature, humidity, battery level, device power
 					</Text>{" "}
-					khi sử dụng thiết bị của SAC
+					while using SAC device.
 				</Text>
 			</View>
 			<View flex-1 width={"100%"} bottom>
 				<Button
 					onPress={onPress}
 					backgroundColor={COLORS.PRIMARY}
-					label="Tuyệt vời"
+					label="Fantastic"
 				/>
 			</View>
 		</View>

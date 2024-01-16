@@ -16,19 +16,18 @@ const IntroSetting = ({ onPress, x, y }: StepType) => {
 					<SettingSVG width={250} height={400} />
 				</Animated.View>
 				<Text text40 color={COLORS.PRIMARY} center marginB-8>
-					Thiết lập tự động
+					Set up automatic mode
 				</Text>
 				<Text text70 color={COLORS.SECONDARY} center>
-					Thiết lập tự động bật/tắt thiết bị dựa trên:{" "}
-					<Text color={COLORS.PRIMARY}>nhiệt độ, độ ẩm</Text> khi sử dụng thiết
-					bị của SAC
+					Automatic device on/off settings based on t when using SAC device.
+					<Text color={COLORS.PRIMARY}>emperature and humidity</Text>
 				</Text>
 			</View>
 			<View flex-1 width={"100%"} bottom>
 				<Button
 					onPress={onPress}
 					backgroundColor={COLORS.PRIMARY}
-					label="Quá tiện lợi"
+					label="Incredibly convenient"
 				/>
 			</View>
 		</View>

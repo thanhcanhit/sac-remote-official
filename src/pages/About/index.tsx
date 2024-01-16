@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Carousel, Image, Text, View } from "react-native-ui-lib";
 import { COLORS } from "../../utils/color";
 import Separator from "../../components/Separator";
-import { BOX_SHADOW } from "../../utils/styles";
-import { Animated, Dimensions, StyleSheet } from "react-native";
+import { Animated, Dimensions, ScrollView, StyleSheet } from "react-native";
 
 const theSharksSource = require("../../assets/imgs/logo/thesharks.jpg");
 const sacoSource = require("../../assets/imgs/logo/saco.jpg");
@@ -13,7 +12,7 @@ const imgSources = [
 	require("../../assets/imgs/team/thu.jpg"),
 	require("../../assets/imgs/team/thien.jpg"),
 	require("../../assets/imgs/team/doan.jpg"),
-	require("../../assets/imgs/team/canh.jpg"),
+	require("../../assets/imgs/team/canh.png"),
 	require("../../assets/imgs/team/huyen.jpg"),
 	require("../../assets/imgs/team/nguyen.jpg"),
 	require("../../assets/imgs/team/thao.jpg"),
@@ -142,19 +141,52 @@ const About = () => {
 								style={{
 									width: "60%",
 									borderRadius: 8,
+									maxHeight: 250,
+									zIndex: 99,
 								}}
 							/>
 						</View>
 					))}
 				</Carousel>
 			</View>
-			{index + 1 < informations.length && (
+
+			{/* Information */}
+			<View style={{ flex: 1 }}>
+				<View flex-1>
+					<Text text70 center color={COLORS.SECONDARY}>
+						{index + 1}/{imgSources.length}
+					</Text>
+
+					<Text text60 center marginT-8>
+						{currentMember.name}
+					</Text>
+
+					<Separator />
+
+					<ScrollView style={{ paddingHorizontal: 24 }}>
+						<Text text80 color={COLORS.SECONDARY}>
+							Specialized: <Text>{capitalize(currentMember.major)}</Text>
+						</Text>
+						<Text text80 color={COLORS.SECONDARY}>
+							Areas of concern:{" "}
+							<Text>{capitalize(currentMember.interest)}</Text>
+						</Text>
+						<Text text80 color={COLORS.SECONDARY}>
+							Reasons to participate:{" "}
+							<Text>{capitalize(currentMember.reasons)}</Text>
+						</Text>
+					</ScrollView>
+				</View>
+			</View>
+
+			<View>
 				<View
 					center
 					width={"100%"}
 					br100
+					marginB-8
 					style={{ overflow: "hidden" }}
-					marginT-32
+					mt-8
 				>
 					<View
 						animated
@@ -167,42 +199,16 @@ const About = () => {
 						}}
 					></View>
 				</View>
-			)}
-			{/* Information */}
-			<View flex-1>
-				<Text text70 center color={COLORS.SECONDARY}>
-					{index + 1}/{imgSources.length}
-				</Text>
-
-				<Text text60 center marginT-8>
-					{currentMember.name}
-				</Text>
-
-				<Separator />
-
-				<View paddingH-24 gap-8>
-					<Text text80 color={COLORS.SECONDARY}>
-						Specialized: <Text>{capitalize(currentMember.major)}</Text>
-					</Text>
-					<Text text80 color={COLORS.SECONDARY}>
-						Areas of concern: <Text>{capitalize(currentMember.interest)}</Text>
-					</Text>
-					<Text text80 color={COLORS.SECONDARY}>
-						Reasons to participate:{" "}
-						<Text>{capitalize(currentMember.reasons)}</Text>
-					</Text>
-				</View>
-			</View>
-
-			<View center row gap-8>
-				<View padding style={styles.logo}>
-					<Image source={theSharksSource} style={styles.imageLogo} />
-				</View>
-				<View padding style={styles.logo}>
-					<Image source={sacoSource} style={styles.imageLogo} />
-				</View>
-				<View padding style={styles.logo}>
-					<Image source={iuhSource} style={styles.imageLogo} />
+				<View bottom center row gap-8 marginT-8>
+					<View padding style={styles.logo}>
+						<Image source={theSharksSource} style={styles.imageLogo} />
+					</View>
+					<View padding style={styles.logo}>
+						<Image source={sacoSource} style={styles.imageLogo} />
+					</View>
+					<View padding style={styles.logo}>
+						<Image source={iuhSource} style={styles.imageLogo} />
+					</View>
 				</View>
 			</View>
 		</View>

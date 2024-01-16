@@ -29,7 +29,7 @@ const GetNamePage = ({ onPress, x, y }: StepType) => {
 						<ChatSVG width={250} height={400} />
 					</Animated.View>
 					<Text text50 color={COLORS.PRIMARY} center marginB-16>
-						Hãy cho tôi biết tên bạn là gì?
+						Let me know your name
 					</Text>
 					<View left paddingH-8>
 						<TextField
@@ -39,7 +39,7 @@ const GetNamePage = ({ onPress, x, y }: StepType) => {
 							color={COLORS.TEXT_BLACK}
 							showCharCounter
 							validate={["required"]}
-							validationMessage={["Hãy cho chúng tôi biết tên của bạn nhé 👋"]}
+							validationMessage={["Please 👋"]}
 							maxLength={30}
 							fieldStyle={{
 								borderWidth: 1,
@@ -56,7 +56,7 @@ const GetNamePage = ({ onPress, x, y }: StepType) => {
 						disabled={name.length < 3}
 						onPress={handleSaveName}
 						backgroundColor={COLORS.PRIMARY}
-						label="Xác nhận"
+						label="Submit"
 					/>
 				</View>
 			</KeyboardAvoidingView>

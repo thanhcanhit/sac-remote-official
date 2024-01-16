@@ -4,6 +4,7 @@ import {
 	ActionSheet,
 	Button,
 	Card,
+	Incubator,
 	Slider,
 	Text,
 	View,
@@ -21,6 +22,7 @@ const Setting = () => {
 		settingHumi,
 		settingTemp,
 		control,
+		auto,
 		setNewControl,
 	} = useContext(BluetoothContext).useBLE;
 
@@ -34,6 +36,7 @@ const Setting = () => {
 		return 1;
 	});
 
+	const [showAutoIsOn, setShowAutoIsOn] = useState<boolean>(false);
 	const [isOpen, setOpen] = useState<boolean>(false);
 	const timer = useRef<NodeJS.Timeout>();
 
@@ -57,6 +60,9 @@ const Setting = () => {
 	};
 
 	const onFanSpeedButtonClick = () => {
+		if (auto) {
+			setShowAutoIsOn(true);
+		}
 		toggleActionSheet();
 		setCurrentSetting("fanSpeed");
 		setSpeedSlider((control - 100) / 50);
@@ -187,8 +193,8 @@ const Setting = () => {
 							<Slider
 								useRange
 								useGap={false}
-								minimumValue={0}
-								maximumValue={100}
+								minimumValue={currentSetting == "temperature" ? 25 : 0}
+								maximumValue={currentSetting == "temperature" ? 40 : 100}
 								initialMinimumValue={rangeSlider.min}
 								initialMaximumValue={rangeSlider.max}
 								onRangeChange={onSliderRangeChange}
@@ -278,6 +284,7 @@ const Setting = () => {
 				renderAction={(options, index) => (
 					<View paddingH-8 gap-8 key={index}>
 						{actionSheetContent}
+
 						<Button
 							label="Confirm"
 							backgroundColor={COLORS.PRIMARY}
@@ -291,6 +298,20 @@ const Setting = () => {
 					</View>
 				)}
 				options={[{ label: "" }]}
+			/>
+			<Incubator.Toast
+				message={
+					"The device is in Automatic mode! turn off automatic to control."
+				}
+				visible={showAutoIsOn}
+				preset={"general"}
+				iconColor={COLORS.PRIMARY}
+				centerMessage
+				swipeable
+				position={"bottom"}
+				backgroundColor={COLORS.WHITE}
+				autoDismiss={2000}
+				onDismiss={() => setShowAutoIsOn(false)}
 			/>
 		</Fragment>
 	);

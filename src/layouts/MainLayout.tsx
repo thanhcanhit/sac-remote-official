@@ -10,13 +10,13 @@ type MainLayoutProps = {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
 	return (
-		<>
+		<View style={{ backgroundColor: "#e3ecf4", flex: 1 }}>
 			<StatusBar />
 			<View useSafeArea style={styles.container}>
 				<Header />
 				<View style={styles.contentContainer}>{children}</View>
 			</View>
-		</>
+		</View>
 	);
 };
 

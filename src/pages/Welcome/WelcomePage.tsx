@@ -16,19 +16,18 @@ const WelcomePage = ({ onPress, x, y }: StepType) => {
 					<WelcomeSVG width={250} height={400} />
 				</Animated.View>
 				<Text text40 color={COLORS.PRIMARY} center marginB-8>
-					Chào mừng
+					Welcome
 				</Text>
 				<Text text70 color={COLORS.SECONDARY} center>
-					Chào mừng bạn đã đến với SAC Remote ❤️ {"\n"}
-					Ứng dụng này sẽ hỗ trợ bạn khi sử dụng thiết bị của SAC (Smart AirCon
-					Clothing)
+					Welcome to SAC Remote ❤️ {"\n"} This app will assist you in using SAC
+					(Smart AirCon Clothing) devices.
 				</Text>
 			</View>
 			<View flex-1 width={"100%"} bottom>
 				<Button
 					backgroundColor={COLORS.PRIMARY}
 					onPress={onPress}
-					label="Bắt đầu khám phá ngay"
+					label="Start exploring now"
 				/>
 			</View>
 		</View>

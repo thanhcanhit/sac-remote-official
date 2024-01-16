@@ -106,6 +106,7 @@ const Welcome = () => {
 	const ActivePage = useMemo(() => {
 		return steps[active] || WelcomePage;
 	}, [active]);
+	
 	return (
 		<View>
 			<View

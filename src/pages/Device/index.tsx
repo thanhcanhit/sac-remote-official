@@ -50,10 +50,10 @@ const Device = () => {
 	const handleConnect = async (id: DeviceType) => {
 		try {
 			const isConnected = await connectToDevice(id);
-			if (isConnected) showToast("Đã kết nối với " + id.name, "success");
+			if (isConnected) showToast("Connected to " + id.name, "success");
 		} catch (e) {
 			showToast(
-				"Không thể kết nối đến thiết bị, đảm bảo rằng đây là thiết bị của SAC",
+				"Unable to connect to the device, ensure it is an SAC device",
 				"failure"
 			);
 		}
@@ -61,7 +61,7 @@ const Device = () => {
 
 	const handleDisconnect = () => {
 		disconnectFromCurrentDevice();
-		showToast("Đã ngắt kết nối thiết bị", "general");
+		showToast("Device disconnected", "general");
 	};
 
 	const showToast = (message: string, variant?: ToastVariant) => {
@@ -90,10 +90,10 @@ const Device = () => {
 	return (
 		<View flex>
 			{(lastDevice || connectedDevice) && (
-				<View flex-1>
+				<View flex-2>
 					<View>
-						<Text text60 marginB-8>
-							Most recently connected device
+						<Text text80 marginB-8>
+							Most recently connected device (press to fast connect/disconnect)
 						</Text>
 						{connectedDevice ? (
 							<DeviceItem
@@ -113,8 +113,8 @@ const Device = () => {
 				</View>
 			)}
 
-			<View flex-5>
-				<Text text60>
+			<View flex-4>
+				<Text text70 style={{ fontWeight: "bold" }}>
 					Devices around you:{" "}
 					<Text text80>
 						(
@@ -223,7 +223,7 @@ const Device = () => {
 								</View>
 								<View row style={styles.infoLine}>
 									<Text color={COLORS.WHITE}>
-										Rec eived Signal Strength Indication:{" "}
+										Received Signal Strength Indication:{" "}
 									</Text>
 									<Text color={COLORS.WHITE}>
 										{selectedDevice.current?.rssi || "- - -"}
@@ -242,17 +242,28 @@ const Device = () => {
 				options={[
 					{
 						label: "Kết nối",
+						backgroundColor: COLORS.PRIMARY,
 						onPress: () => {
 							if (selectedDevice.current) handleConnect(selectedDevice.current);
 						},
 					},
 					{
 						label: "Hủy bỏ",
+						backgroundColor: COLORS.GRAY,
 						onPress: () => {
 							setShowDetailModal(false);
 						},
 					},
 				]}
+				renderAction={(option) => (
+					<Button
+						label={option.label}
+						key={option.label}
+						style={{ marginVertical: 2, marginHorizontal: 8 }}
+						backgroundColor={option.backgroundColor}
+						onPress={option.onPress}
+					></Button>
+				)}
 				visible={showDetailModal}
 			></ActionSheet>
 
