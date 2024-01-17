@@ -117,8 +117,8 @@ const About = () => {
 	}
 
 	return (
-		<View flex>
-			<View flex-1>
+		<View>
+			<View>
 				<Text text50 center marginB-16 color={COLORS.PRIMARY}>
 					The Sharks Team
 				</Text>
@@ -151,8 +151,8 @@ const About = () => {
 			</View>
 
 			{/* Information */}
-			<View style={{ flex: 1 }}>
-				<View flex-1>
+			<View>
+				<View>
 					<Text text70 center color={COLORS.SECONDARY}>
 						{index + 1}/{imgSources.length}
 					</Text>
@@ -163,7 +163,7 @@ const About = () => {
 
 					<Separator />
 
-					<ScrollView style={{ paddingHorizontal: 24 }}>
+					<ScrollView style={{ paddingHorizontal: 24, height:200 }}>
 						<Text text80 color={COLORS.SECONDARY}>
 							Specialized: <Text>{capitalize(currentMember.major)}</Text>
 						</Text>
@@ -184,9 +184,7 @@ const About = () => {
 					center
 					width={"100%"}
 					br100
-					marginB-8
 					style={{ overflow: "hidden" }}
-					mt-8
 				>
 					<View
 						animated
@@ -225,7 +223,7 @@ const styles = StyleSheet.create({
 	},
 	imageLogo: {
 		objectFit: "contain",
-		width: 75,
-		height: 50,
+		width: 50,
+		height: 25,
 	},
 });

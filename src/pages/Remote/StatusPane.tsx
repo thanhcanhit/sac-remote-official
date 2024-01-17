@@ -56,12 +56,7 @@ const StatusPane = ({
 	return (
 		<View>
 			<ScrollBar gradientMargins={8}>
-				<View
-					row
-					padding-8
-					gap-8
-					style={{ marginLeft: -6, zIndex: 9 }}
-				>
+				<View row padding-8 gap-8 style={{ marginLeft: -6, zIndex: 1 }}>
 					{serviceList.map((service) => (
 						<ServiceButton
 							key={service.id}
@@ -77,7 +72,7 @@ const StatusPane = ({
 					))}
 				</View>
 			</ScrollBar>
-			<View>{activeStatus}</View>
+			<View marginT-8>{activeStatus}</View>
 		</View>
 	);
 };

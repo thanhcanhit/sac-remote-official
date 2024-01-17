@@ -5,6 +5,7 @@ import FanSwitch from "../../components/FanSwitch";
 import StatusPane from "./StatusPane";
 import Setting from "./Setting";
 import { COLORS } from "../../utils/color";
+import { ScrollView } from "react-native";
 
 export type InfoCharacterisctic =
 	| "temperature"
@@ -52,19 +53,20 @@ const Remote = () => {
 	}, []);
 
 	return (
-		<View flex>
-			<View flex-1>
-				<View row centerV>
-					<View flex-3 left>
+		<ScrollView style={{ height: "100%" }}>
+			<View>
+				<View row centerV style={{ justifyContent: "space-between" }}>
+					<View left>
 						<Text text70 style={{ fontWeight: "bold" }}>
 							Status
 						</Text>
-
-						{!connectedDevice && (
-							<Text text90 center my-4 color={COLORS.RED}>
-								(There is currently no connection to any device)
-							</Text>
-						)}
+						<>
+							{!connectedDevice && (
+								<Text text90 center my-4 color={COLORS.RED}>
+									(No connection)
+								</Text>
+							)}
+						</>
 
 						<View row gap-8>
 							<Text color={COLORS.PRIMARY} style={{ fontWeight: "bold" }}>
@@ -77,7 +79,7 @@ const Remote = () => {
 							/>
 						</View>
 					</View>
-					<View flex-1 right>
+					<View right>
 						<FanSwitch state={power} onPress={togglePower} />
 					</View>
 				</View>
@@ -91,7 +93,7 @@ const Remote = () => {
 					/>
 				</View>
 			</View>
-			<View flex-1 marginT-8 paddingT-8 paddingB-16>
+			<View marginT-8 paddingT-8 paddingB-16 marginB-20>
 				<View>
 					<View row py-2 style={{ justifyContent: "space-between" }}>
 						<Text left text70 style={{ fontWeight: "bold" }} marginB-8>
@@ -129,7 +131,7 @@ const Remote = () => {
 				autoDismiss={2000}
 				onDismiss={() => setShowAutoIsOn(false)}
 			/>
-		</View>
+		</ScrollView>
 	);
 };
 

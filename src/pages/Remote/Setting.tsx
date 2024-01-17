@@ -257,14 +257,13 @@ const Setting = () => {
 
 	return (
 		<Fragment>
-			<ScrollView style={{ width: "100%" }}>
+			<ScrollView >
 				<View gap-8>
 					{settings.map((setting) => (
 						<Card
 							enableShadow
 							row
 							padding-16
-							height={100}
 							onPress={setting.onPress}
 							key={setting.name}
 						>
@@ -297,7 +296,7 @@ const Setting = () => {
 						/>
 					</View>
 				)}
-				options={[{ label: "" }]}
+				options={[{ label: "Setting" }]}
 			/>
 			<Incubator.Toast
 				message={

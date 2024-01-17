@@ -10,11 +10,11 @@ type StatusProgressProps = {
 
 const StatusProgress = ({ state }: StatusProgressProps) => {
 	return (
-		<View center marginT-8 style={{zIndex: -1}}>
+		<View center style={{ zIndex: -10 }}>
 			<AnimatedCircularProgress
-				size={250}
-				width={20}
-				backgroundWidth={28}
+				size={200}
+				width={15}
+				backgroundWidth={24}
 				fill={state}
 				arcSweepAngle={240}
 				lineCap="round"
@@ -29,16 +29,15 @@ const StatusProgress = ({ state }: StatusProgressProps) => {
 						start={{ x: 0.03, y: 0 }}
 						end={{ x: 0.97, y: 0 }}
 						style={{
-							padding: 16,
 							display: "flex",
 							justifyContent: "center",
 							alignItems: "center",
-							width: 160,
-							height: 160,
+							width: 130,
+							height: 130,
 							borderRadius: 999,
 						}}
 					>
-						<Text text20 color={COLORS.WHITE} style={{ fontWeight: "bold" }}>
+						<Text text30 color={COLORS.WHITE} style={{ fontWeight: "bold" }}>
 							{Math.round(fill)}
 						</Text>
 					</LinearGradient>
