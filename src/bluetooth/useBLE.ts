@@ -206,9 +206,7 @@ function useBLE(): BluetoothLowEnergyApi {
 			return -1;
 		}
 
-		// console.log("Temp update: " + characteristic.value);
 		const rawData = base64.decode(characteristic.value);
-		console.log("Temp update: " + rawData);
 
 		setTemperature(Number(rawData));
 	};
@@ -226,7 +224,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value);
-		console.log("Battery update: " + rawData);
 
 		setBattery(Number(rawData));
 	};
@@ -244,7 +241,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value);
-		console.log("Humidity update: " + rawData);
 
 		setHumidity(Number(rawData));
 	};
@@ -262,7 +258,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value);
-		console.log("Power update: " + rawData + " (" + Boolean(rawData));
 
 		setPower(Boolean(Number(rawData)));
 	};
@@ -279,11 +274,8 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = base64.decode(characteristic.value).replace(/"/g, "");
-		console.log("Listen setting RAW " + rawData);
 		const value = rawData.split(" ").map((str_value) => Number(str_value));
-		console.log("Listen setting temp " + value);
 
-		console.log("VALUE" + value[0], "VALUE" + value[1]);
 		setSettingTemp({ min: value[0], max: value[1] });
 	};
 
@@ -302,7 +294,6 @@ function useBLE(): BluetoothLowEnergyApi {
 		const rawData = base64.decode(characteristic.value).replace(/"/g, "");
 		const value = rawData.split(" ").map((str_value) => Number(str_value));
 
-		console.log("VALUE" + value);
 		setSettingHumi({ min: value[0], max: value[1] });
 	};
 
@@ -318,12 +309,10 @@ function useBLE(): BluetoothLowEnergyApi {
 		}
 
 		const rawData = Number(base64.decode(characteristic.value));
-		console.log("Control update: " + rawData);
 		let fanSpeed: fanSpeed;
 		if (rawData < 150) fanSpeed = 150;
 		else if (rawData < 250) fanSpeed = 200;
 		else fanSpeed = 250;
-		console.log("Control transform update: " + fanSpeed);
 
 		setControl(fanSpeed);
 	};
@@ -466,9 +455,7 @@ function useBLE(): BluetoothLowEnergyApi {
 					SAC_BLE_SERVICES_UUID.infoService.uuid,
 					SAC_BLE_SERVICES_UUID.infoService.characteristics.power
 				);
-			console.log("FIRST READ " + characteristic?.value);
 			if (characteristic?.value) {
-				console.log("FIRST HAS VALUE " + base64.decode(characteristic.value));
 				const value = Boolean(Number(base64.decode(characteristic.value)));
 
 				setPower(value);

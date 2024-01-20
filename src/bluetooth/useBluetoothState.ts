@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import BluetoothStateManager, {
 	BluetoothState,
 } from "react-native-bluetooth-state-manager";
